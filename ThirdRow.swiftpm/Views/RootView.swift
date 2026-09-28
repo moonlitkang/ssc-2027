@@ -115,9 +115,16 @@ struct RootView: View {
 
             case .copy(let source):
                 CopyView(source: source, isLast: asked.count >= askRounds) { page in
-                    // Keep the last page. It is what the reveal hands back.
-                    written = page
-                    ink = InkMetrics(drawing: page)
+                    // Keep the *first* page, not the last one. You ask twice,
+                    // and the point of the second ask is that the first answer
+                    // was already second-hand — so the page the ending hands
+                    // back has to be the copy of a copy, not the copy of a
+                    // second opinion. Overwriting it quietly swapped the most
+                    // damning piece of evidence in the piece for the least.
+                    if written == nil {
+                        written = page
+                        ink = InkMetrics(drawing: page)
+                    }
                     phase = .interlude(source)
                 }
 

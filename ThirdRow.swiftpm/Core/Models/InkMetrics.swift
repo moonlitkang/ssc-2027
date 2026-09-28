@@ -47,8 +47,18 @@ struct InkMetrics: Equatable {
             }
         }
 
-        // PencilKit measures in points, and there are 72 to the inch.
-        let centimetres = Double(totalPoints) * 2.54 / 72.0
+        // PencilKit measures in points, and a point is not a printer's point:
+        // on the iPad this was drawn for, the screen is 264 pixels to the inch
+        // at @2x, so there are 132 of these to the inch, not 72. Using 72
+        // overstated every measurement by a factor of 1.8 — and this is the one
+        // number in the piece that claims to be measured rather than written,
+        // so being wrong by 83% is worse than not reporting it.
+        //
+        // 132 is the iPad figure. A phone ranges from 134 to 163 depending on
+        // the model, and there is no public API for it, so this is an estimate
+        // on those — but it is the right estimate for the device the piece is
+        // built for.
+        let centimetres = Double(totalPoints) * 2.54 / 132.0
 
         self.init(
             strokes: drawing.strokes.count,
