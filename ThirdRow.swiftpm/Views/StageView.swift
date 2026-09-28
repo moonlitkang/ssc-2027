@@ -158,7 +158,11 @@ struct StageView: View {
         let held = eye.squintedSeconds - baseline
         let thresholds = act.lineThresholds
 
-        if revealed < act.lateLines.count, held >= thresholds[revealed] {
+        // A while, not an if: the tick arrives five times a second, so one step
+        // per call was fine in normal play, but a capture beat jumps straight to
+        // thirteen seconds and would only ever reveal the first line — which is
+        // exactly what the fog screenshot showed.
+        while revealed < act.lateLines.count, held >= thresholds[revealed] {
             revealed += 1
             withAnimation(.easeInOut(duration: 0.55)) {
                 lateLine = act.lateLines[revealed - 1]

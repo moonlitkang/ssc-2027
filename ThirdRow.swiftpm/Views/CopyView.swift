@@ -43,10 +43,10 @@ struct CopyView: View {
             .padding(.bottom, 16)
 
             board
-                // Shorter than it was, because the lettering on it is now the
-                // size the last act used. The same board, seen from the same
-                // seat, has the same amount of white space around the writing.
-                .frame(height: 112)
+                // Sized from the same ratio the board is drawn at, so the strip
+                // is exactly as tall as the board needs and no taller — on a
+                // phone as well as on the iPad.
+                .aspectRatio(1 / (Self.boardWidthFraction * Self.boardAspect), contentMode: .fit)
                 .padding(.bottom, 18)
 
             notebook
@@ -93,25 +93,31 @@ struct CopyView: View {
     /// The board as it looks from the last row: legible as a shape, useless as
     /// information.
     ///
-    /// This used to draw the problem at thirty points while the act before it
-    /// drew the same problem at twenty, and the blur radius was identical in
-    /// both — so the ratio of blur to letter size was *lower* here than on the
-    /// screen where you had just given up. Past about eight seconds of squinting
-    /// the last act's board was the foggier of the two, and the caption saying
-    /// you cannot check your work against it was describing the opposite of
-    /// what was on screen.
+    /// This is the same board as the act before it, and that has to be true in
+    /// the geometry as well as in the prescription. Two earlier versions got
+    /// this wrong in opposite directions: the first drew the problem at thirty
+    /// points while the act drew it at twenty, so the copy scene was *clearer*
+    /// than the screen you had just given up on; the second scaled the type by
+    /// the full canvas width and left the board stretched into a 7:1 strip that
+    /// no classroom has.
     ///
-    /// Now both boards scale their lettering by the same factor, so "same
-    /// prescription, same six metres" is finally true of the thing you can
-    /// actually see: the same fraction of a letter is missing in both.
+    /// Now the board is drawn at the width and proportion `ClassroomScene` uses,
+    /// so the lettering comes out at the same size and the blur at the same
+    /// radius. Same prescription, same six metres, same board.
     private var board: some View {
         GeometryReader { geo in
-            let scale = geo.size.width / Optics.referenceWidth
+            // Both of these mirror ClassroomScene.board(w:h:). They are repeated
+            // rather than shared because that view takes a size, not a ratio —
+            // and a board whose proportions are off is not the same board.
+            let canvas = geo.size.width
+            let boardW = canvas * Self.boardWidthFraction
+            let boardH = boardW * Self.boardAspect
+            let scale = canvas / Optics.referenceWidth
             let blur = Defocus(
                 sphericalError: act.sphericalError,
                 pupilMM: Optics.dilatedPupilMM
             )
-            .radius(at: Defocus.Distance.board, width: geo.size.width)
+            .radius(at: Defocus.Distance.board, width: canvas)
 
             ZStack {
                 RoundedRectangle(cornerRadius: 4)
@@ -123,11 +129,17 @@ struct CopyView: View {
                 }
                 .blur(radius: blur)
             }
+            .frame(width: boardW, height: boardH)
             .padding(4)
             .background(AppTheme.wood)
             .clipShape(RoundedRectangle(cornerRadius: 7))
+            .frame(width: canvas, height: geo.size.height)
         }
     }
+
+    /// The board's share of the room, copied from `ClassroomScene`.
+    private static let boardWidthFraction: CGFloat = 0.56
+    private static let boardAspect: CGFloat = 0.67
 
     private var notebook: some View {
         ZStack(alignment: .topLeading) {
