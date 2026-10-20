@@ -15,13 +15,12 @@ struct StageView: View {
                 .foregroundColor(AppTheme.inkSoft)
                 .multilineTextAlignment(.center)
                 .opacity(captionVisible ? 1 : 0)
-                .padding(.top, 16)
-
-            Spacer(minLength: 12)
+                .padding(.top, 22)
+                .padding(.bottom, 26)
 
             BlackboardView(act: act, blurRadius: eye.blurRadius)
                 .frame(maxWidth: .infinity)
-                .frame(height: 300)
+                .frame(height: 380)
                 .contentShape(Rectangle())
                 .gesture(
                     DragGesture(minimumDistance: 0)
@@ -29,11 +28,11 @@ struct StageView: View {
                         .onEnded { _ in eye.endSquint() }
                 )
 
-            Spacer(minLength: 12)
+            Spacer(minLength: 16)
 
-            VStack(spacing: 8) {
+            VStack(spacing: 6) {
                 StrainBar(value: eye.strain)
-                    .frame(height: 10)
+                    .frame(height: 12)
                 HStack {
                     Text("Eye strain")
                         .font(.system(size: 12))
@@ -48,7 +47,7 @@ struct StageView: View {
             Text("Hold the board to squint.")
                 .font(.system(size: 14))
                 .foregroundColor(AppTheme.inkSoft)
-                .padding(.top, 18)
+                .padding(.top, 20)
 
             Button {
                 eye.endSquint()
@@ -57,15 +56,15 @@ struct StageView: View {
                 Text(isLast ? "Put on your glasses" : "Two weeks later")
                     .font(.system(size: 17, weight: .semibold))
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
+                    .padding(.vertical, 15)
                     .background(AppTheme.ink)
                     .foregroundColor(AppTheme.paper)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
             }
             .padding(.top, 14)
-            .padding(.bottom, 24)
+            .padding(.bottom, 30)
         }
-        .padding(.horizontal, 36)
+        .padding(.horizontal, 34)
         .onAppear {
             captionVisible = false
             withAnimation(.easeIn(duration: 0.45)) { captionVisible = true }

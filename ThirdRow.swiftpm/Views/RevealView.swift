@@ -37,7 +37,7 @@ struct RevealView: View {
                     .blur(radius: blur)
             }
             .frame(maxWidth: .infinity)
-            .frame(height: 300)
+            .frame(height: 380)
             .opacity(boardOpacity)
 
             Spacer(minLength: 12)
