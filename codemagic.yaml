@@ -1,0 +1,66 @@
+workflows:
+  probe:
+    name: Third Row / build probe
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      xcode: latest
+      vars:
+        APP_PACKAGE: ThirdRow.swiftpm
+        SCHEME: ThirdRow
+    scripts:
+      - name: Toolchain
+        script: |
+          echo "=== macOS ==="
+          sw_vers
+          echo "=== xcodebuild ==="
+          xcodebuild -version
+          echo "=== swift ==="
+          swift --version
+          echo "=== installed Xcodes ==="
+          ls /Applications | grep -i xcode || true
+
+      - name: Inspect the app package
+        script: |
+          echo "=== files ==="
+          find "$APP_PACKAGE" -maxdepth 2 -type f | sort
+          echo "=== xcodebuild -list (may fail for .swiftpm) ==="
+          cd "$APP_PACKAGE"
+          xcodebuild -list -json || true
+
+      - name: Pick an iPad simulator
+        script: |
+          xcrun simctl list devices available | grep -i ipad | head -20 || true
+          SIM=$(xcrun simctl list devices available -j | python3 -c "
+import json,sys
+d=json.load(sys.stdin)['devices']
+names=[x['name'] for k,v in d.items() if 'iOS' in k for x in v if x['name'].startswith('iPad')]
+print(names[0] if names else '')")
+          echo "picked simulator: $SIM"
+          echo "SIM=$SIM" >> "$CM_ENV"
+
+      - name: Build for simulator
+        script: |
+          cd "$APP_PACKAGE"
+          xcodebuild -scheme "$SCHEME" \
+            -destination "platform=iOS Simulator,name=$SIM" \
+            -derivedDataPath build \
+            build
+
+      - name: Install, launch and screenshot
+        script: |
+          APP=$(find "$APP_PACKAGE/build/Build/Products" -name "*.app" -maxdepth 4 | head -1)
+          echo "app bundle: $APP"
+          BID=$(plutil -extract CFBundleIdentifier raw "$APP/Info.plist")
+          echo "bundle id: $BID"
+          xcrun simctl boot "$SIM" || true
+          xcrun simctl bootstatus "$SIM" -b || true
+          xcrun simctl install booted "$APP"
+          xcrun simctl launch booted "$BID"
+          sleep 5
+          xcrun simctl io booted screenshot shot-01.png
+          ls -la shot-01.png
+
+    artifacts:
+      - shot-*.png
+      - ThirdRow.swiftpm/build/**/Build/*.xcactivitylog

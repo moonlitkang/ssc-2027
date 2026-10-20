@@ -1,8 +1,8 @@
 name: build
 
+# macOS runners are not assignable on this account (see project handover report).
+# Kept for later; runs only when triggered by hand. Primary CI is codemagic.yaml.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 jobs:
