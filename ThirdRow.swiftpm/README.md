@@ -14,7 +14,16 @@ Three seats. Two weeks apart. Then a pair of glasses arrives, and the blur is ta
 
 - Press and hold the blackboard to squint.
 - Watch the strain bar. It never goes back down as fast as it went up.
-- Three rows. Then a recap with the number of seconds you spent squinting.
+- Three rows. Then a pair of glasses, and a recap with the number of seconds you spent squinting.
+
+## Screens
+
+Captured automatically on every build (see `docs/screens/`).
+
+| | |
+|---|---|
+| ![intro](../docs/screens/01-intro.png) | ![row 3](../docs/screens/02-row3.png) |
+| ![row 7](../docs/screens/03-row7.png) | ![glasses](../docs/screens/04-glasses.png) |
 
 ## Structure
 
