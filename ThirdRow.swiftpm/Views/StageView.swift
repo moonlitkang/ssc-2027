@@ -18,7 +18,8 @@ struct StageView: View {
                 .padding(.top, 26)
                 .padding(.bottom, 22)
 
-            BlackboardView(act: act, blurRadius: eye.blurRadius)
+            ClassroomScene(act: act, blurRadius: eye.blurRadius)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .contentShape(Rectangle())
                 .gesture(

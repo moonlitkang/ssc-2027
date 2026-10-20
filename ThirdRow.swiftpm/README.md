@@ -32,9 +32,16 @@ ThirdRow.swiftpm/
   Package.swift          Swift Playgrounds app manifest
   ThirdRowApp.swift      entry point
   Core/Models/           EyeState (mechanic), Act (three-stage config)
-  Views/                 RootView, BlackboardView, StrainBar, RecapView
+  Views/                 RootView, IntroView, StageView, ClassroomScene, RevealView, RecapView, StrainBar
   Utilities/AppTheme.swift
 ```
+
+## Why the room is drawn, not decorated
+
+`ClassroomScene` is a first-person view from the seat. Two rules:
+
+- The number of desk rows between you and the board grows with the act (row 3 → one row of heads in front, row 7 → three). The seat change is shown, not narrated.
+- **Only the board is blurred.** Myopia is a distance problem: the desks in front of you stay sharp while the far layer goes soft. Blurring the whole screen would just be a filter.
 
 ## Running it
 
