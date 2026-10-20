@@ -1,0 +1,10 @@
+.DS_Store
+build/
+.build/
+*.xcuserstate
+ThirdRow.swiftpm/.swiftpm/xcode/xcuserdata/
+dist/
+refs/
+.workbuddy/
+SSC2027_*.md
+项目交接报告.md

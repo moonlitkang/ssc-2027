@@ -1,0 +1,70 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Diagnostics
+        run: |
+          echo "--- installed Xcodes ---"
+          ls /Applications | grep -i xcode || true
+          echo "--- default ---"
+          xcodebuild -version || true
+          swift --version || true
+
+      - name: List schemes in the app package
+        continue-on-error: true
+        working-directory: ThirdRow.swiftpm
+        run: xcodebuild -list -json || true
+
+      - name: Pick an iPad simulator
+        id: sim
+        run: |
+          SIM=$(xcrun simctl list devices available -j | python3 -c "
+import json,sys
+d=json.load(sys.stdin)['devices']
+names=[x['name'] for k,v in d.items() if 'iOS' in k for x in v if x['name'].startswith('iPad')]
+print(names[0] if names else '')")
+          echo "picked: $SIM"
+          echo "sim=$SIM" >> "$GITHUB_OUTPUT"
+
+      - name: Build for simulator
+        id: build
+        continue-on-error: true
+        working-directory: ThirdRow.swiftpm
+        run: |
+          xcodebuild -scheme ThirdRow \
+            -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.sim }}" \
+            -derivedDataPath build \
+            build 2>&1 | tail -80
+
+      - name: Screenshot
+        continue-on-error: true
+        run: |
+          APP=$(find ThirdRow.swiftpm/build/Build/Products -name "ThirdRow.app" -maxdepth 3 | head -1)
+          echo "app bundle: $APP"
+          if [ -z "$APP" ]; then echo "no app bundle, skipping"; exit 0; fi
+          BID=$(plutil -extract CFBundleIdentifier raw "$APP/Info.plist")
+          echo "bundle id: $BID"
+          xcrun simctl boot "${{ steps.sim.outputs.sim }}" || true
+          xcrun simctl bootstatus "${{ steps.sim.outputs.sim }}" -b || true
+          xcrun simctl install booted "$APP"
+          xcrun simctl launch booted "$BID"
+          sleep 4
+          xcrun simctl io booted screenshot shot-01.png
+          ls -la shot-01.png
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: shot-*.png
+          if-no-files-found: warn
