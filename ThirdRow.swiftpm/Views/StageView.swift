@@ -15,20 +15,17 @@ struct StageView: View {
                 .foregroundColor(AppTheme.inkSoft)
                 .multilineTextAlignment(.center)
                 .opacity(captionVisible ? 1 : 0)
-                .padding(.top, 22)
-                .padding(.bottom, 26)
+                .padding(.top, 26)
+                .padding(.bottom, 22)
 
             BlackboardView(act: act, blurRadius: eye.blurRadius)
-                .frame(maxWidth: .infinity)
-                .frame(height: 380)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .contentShape(Rectangle())
                 .gesture(
                     DragGesture(minimumDistance: 0)
                         .onChanged { _ in eye.beginSquint() }
                         .onEnded { _ in eye.endSquint() }
                 )
-
-            Spacer(minLength: 16)
 
             VStack(spacing: 6) {
                 StrainBar(value: eye.strain)
@@ -43,25 +40,27 @@ struct StageView: View {
                         .foregroundColor(AppTheme.inkSoft)
                 }
             }
+            .padding(.top, 24)
 
-            Text("Hold the board to squint.")
-                .font(.system(size: 14))
-                .foregroundColor(AppTheme.inkSoft)
-                .padding(.top, 20)
+            HStack(spacing: 14) {
+                Text("Hold the board to squint.")
+                    .font(.system(size: 14))
+                    .foregroundColor(AppTheme.inkSoft)
 
-            Button {
-                eye.endSquint()
-                onNext()
-            } label: {
-                Text(isLast ? "Put on your glasses" : "Two weeks later")
-                    .font(.system(size: 17, weight: .semibold))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 15)
-                    .background(AppTheme.ink)
-                    .foregroundColor(AppTheme.paper)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                Button {
+                    eye.endSquint()
+                    onNext()
+                } label: {
+                    Text(isLast ? "Put on your glasses" : "Two weeks later")
+                        .font(.system(size: 16, weight: .semibold))
+                        .padding(.horizontal, 22)
+                        .padding(.vertical, 14)
+                        .background(AppTheme.ink)
+                        .foregroundColor(AppTheme.paper)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
             }
-            .padding(.top, 14)
+            .padding(.top, 18)
             .padding(.bottom, 30)
         }
         .padding(.horizontal, 34)

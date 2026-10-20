@@ -15,9 +15,8 @@ struct RevealView: View {
                 .foregroundColor(AppTheme.inkSoft)
                 .multilineTextAlignment(.center)
                 .opacity(captionOpacity)
-                .padding(.top, 16)
-
-            Spacer(minLength: 12)
+                .padding(.top, 26)
+                .padding(.bottom, 22)
 
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
@@ -36,17 +35,15 @@ struct RevealView: View {
                     .foregroundColor(AppTheme.chalk)
                     .blur(radius: blur)
             }
-            .frame(maxWidth: .infinity)
-            .frame(height: 380)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .opacity(boardOpacity)
-
-            Spacer(minLength: 12)
 
             Text("It took less than a second.")
                 .font(.system(size: 14))
                 .foregroundColor(AppTheme.inkSoft)
                 .opacity(captionOpacity)
-                .padding(.bottom, 40)
+                .padding(.top, 22)
+                .padding(.bottom, 34)
         }
         .padding(.horizontal, 36)
         .onAppear {
