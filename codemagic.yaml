@@ -43,7 +43,7 @@ workflows:
             -derivedDataPath build \
             build
 
-      - name: Install, launch and screenshot
+      - name: Install, launch and screenshot each beat
         script: |
           APP=$(find "$APP_PACKAGE/build/Build/Products" -name "*.app" -maxdepth 4 | head -1)
           echo "app bundle: $APP"
@@ -52,10 +52,19 @@ workflows:
           xcrun simctl boot "$SIM" || true
           xcrun simctl bootstatus "$SIM" -b || true
           xcrun simctl install booted "$APP"
-          xcrun simctl launch booted "$BID"
-          sleep 5
-          xcrun simctl io booted screenshot shot-01.png
-          ls -la shot-01.png
+          for PHASE in intro stage1 stage3 reveal recap; do
+            xcrun simctl terminate booted "$BID" || true
+            sleep 1
+            if [ "$PHASE" = "intro" ]; then
+              xcrun simctl launch booted "$BID" || true
+            else
+              xcrun simctl launch booted "$BID" -startAt "$PHASE" || true
+            fi
+            if [ "$PHASE" = "reveal" ]; then sleep 2; else sleep 4; fi
+            xcrun simctl io booted screenshot "shot-$PHASE.png" || true
+            echo "captured $PHASE"
+          done
+          ls -la shot-*.png
 
     artifacts:
       - shot-*.png
