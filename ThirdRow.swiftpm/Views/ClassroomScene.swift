@@ -68,7 +68,7 @@ struct ClassroomScene: View {
                         .frame(height: 5)
                     Rectangle()
                         .fill(AppTheme.floor)
-                        .frame(height: h * 0.30)
+                        .frame(height: h * 0.42)
                 }
 
                 board(w: w, h: h)
@@ -170,47 +170,53 @@ struct ClassroomScene: View {
     // MARK: - Front of the room
 
     private func teacherDesk(w: CGFloat, h: CGFloat) -> some View {
-        let deskW = w * 0.28
-        let topH = h * 0.022
-        let bodyH = h * 0.052
+        let deskW = w * 0.26
+        let totalH = h * 0.105
+        let topH = h * 0.020
+        let legH = h * 0.030
+        let bodyH = totalH - topH - legH
+        let floorY = h * 0.58
+
         return ZStack(alignment: .top) {
-            // legs
             HStack {
-                Rectangle().fill(AppTheme.wood).frame(width: 5)
+                Rectangle().fill(AppTheme.wood).frame(width: 5, height: legH)
                 Spacer()
-                Rectangle().fill(AppTheme.wood).frame(width: 5)
+                Rectangle().fill(AppTheme.wood).frame(width: 5, height: legH)
             }
-            .frame(width: deskW * 0.92, height: bodyH)
+            .frame(width: deskW * 0.78)
+            .offset(y: topH + bodyH)
 
             VStack(spacing: 0) {
                 Rectangle()
                     .fill(AppTheme.woodLight)
-                    .frame(width: deskW, height: topH)
+                    .frame(height: topH)
                 Rectangle()
                     .fill(AppTheme.desk)
-                    .frame(width: deskW * 0.94, height: bodyH)
+                    .frame(height: bodyH)
                     .overlay(
                         Rectangle()
-                            .fill(AppTheme.wood.opacity(0.35))
+                            .fill(AppTheme.wood.opacity(0.30))
                             .frame(height: 1)
-                            .offset(y: bodyH * 0.18)
+                            .offset(y: bodyH * 0.15),
+                        alignment: .top
                     )
             }
+            .frame(width: deskW)
 
-            // things on the desk: a stack of notebooks and a chalk box
+            // a stack of notebooks on the desk
             HStack(spacing: 3) {
-                Rectangle().fill(AppTheme.notebook).frame(width: deskW * 0.20, height: 3)
-                Rectangle().fill(AppTheme.notebook).frame(width: deskW * 0.20, height: 3)
+                Rectangle().fill(AppTheme.notebook).frame(width: deskW * 0.17, height: 3)
+                Rectangle().fill(AppTheme.notebook).frame(width: deskW * 0.17, height: 3)
             }
-            .offset(y: -2)
+            .offset(y: -3)
         }
-        .frame(width: deskW, height: topH + bodyH)
-        .position(x: w * 0.40, y: h * 0.565)
+        .frame(width: deskW, height: totalH)
+        .position(x: w * 0.38, y: floorY - totalH / 2)
     }
 
     private func deskRow(slot: Int, w: CGFloat, h: CGFloat) -> some View {
         let widths: [CGFloat] = [0.40, 0.56, 0.74]
-        let ys: [CGFloat] = [0.665, 0.785, 0.905]
+        let ys: [CGFloat] = [0.700, 0.800, 0.888]
         let bw = w * widths[slot]
         let deskH = h * 0.030
         let studentW = bw * 0.22
