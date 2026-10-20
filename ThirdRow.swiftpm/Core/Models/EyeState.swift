@@ -40,9 +40,9 @@ final class EyeState: ObservableObject {
         min(1.0, max(0.0, baseClarity + squint - strain * 0.45))
     }
 
-    /// Capped at 18 on purpose: past that the words disappear instead of getting hard.
+    /// Capped on purpose: past ~8 the words stop being "hard to read" and just vanish.
     var blurRadius: CGFloat {
-        CGFloat(max(0.0, 1.0 - clarity) * 18.0)
+        CGFloat(max(0.0, 1.0 - clarity) * 11.0)
     }
 
     func beginSquint() {

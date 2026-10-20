@@ -17,7 +17,7 @@ extension Act {
             caption: "Row 3. You can still read it.",
             words: "SOLVE FOR X",
             fontSize: 46,
-            baseClarity: 0.86
+            baseClarity: 0.90
         ),
         Act(
             id: 1,
@@ -25,7 +25,7 @@ extension Act {
             caption: "Two weeks later. Row 5.",
             words: "SOLVE FOR X",
             fontSize: 34,
-            baseClarity: 0.62
+            baseClarity: 0.64
         ),
         Act(
             id: 2,
@@ -33,7 +33,7 @@ extension Act {
             caption: "Two weeks later. Row 7.",
             words: "SOLVE FOR X",
             fontSize: 24,
-            baseClarity: 0.40
+            baseClarity: 0.38
         )
     ]
 }
