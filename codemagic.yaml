@@ -31,11 +31,7 @@ workflows:
       - name: Pick an iPad simulator
         script: |
           xcrun simctl list devices available | grep -i ipad | head -20 || true
-          SIM=$(xcrun simctl list devices available -j | python3 -c "
-import json,sys
-d=json.load(sys.stdin)['devices']
-names=[x['name'] for k,v in d.items() if 'iOS' in k for x in v if x['name'].startswith('iPad')]
-print(names[0] if names else '')")
+          SIM=$(xcrun simctl list devices available | sed -n 's/^ *\(iPad.*\) ([0-9A-Fa-f-]\{36\}) (.*$/\1/p' | head -1)
           echo "picked simulator: $SIM"
           echo "SIM=$SIM" >> "$CM_ENV"
 
