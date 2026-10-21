@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 import PencilKit
 
 /// A bare drawing surface: no tool picker, no undo bar, nothing to configure.

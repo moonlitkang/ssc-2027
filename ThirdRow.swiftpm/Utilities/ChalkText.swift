@@ -15,9 +15,9 @@ struct ChalkText: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            ForEach(Array(text.enumerated()), id: \.offset) { index, character in
-                let w = wobble(at: index)
-                Text(String(character))
+            ForEach(Array(text.enumerated()), id: \.offset) { item in
+                let w = wobble(at: item.offset)
+                Text(String(item.element))
                     .font(.system(size: size, weight: weight, design: .serif))
                     .foregroundColor(AppTheme.chalk)
                     .shadow(color: AppTheme.chalk.opacity(0.28), radius: 0.9, x: 0.7, y: 0.4)

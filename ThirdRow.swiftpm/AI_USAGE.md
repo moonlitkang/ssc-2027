@@ -24,6 +24,11 @@ An AI assistant (a large language model used through a coding tool) helped with:
 | 2026-10-20 | Project structure | `Package.swift`, folder layout, initial SwiftUI view skeletons | Chose Swift Playgrounds app package over a plain Xcode project; chose iOS 17 deployment target |
 | 2026-10-20 | Mechanic | `EyeState` counter loop with strain/squint accumulation | Set the tuning values (squint gain, strain rate, recovery rate) so recovery is much slower than damage |
 | 2026-10-20 | Copy | English strings for the three rows and the recap | Replaced generic placeholder text with the author's own numbers and phrasing |
+| 2026-10-21 | Classroom | Rewrote `ClassroomScene`: skirting board, ceiling tubes, wall timetable, thicker desk legs, shoulders on the silhouettes, `ChalkText` for letter-by-letter chalk wobble | Rejected the first drawn classroom as a wireframe. Wrote the rule that nothing floats and the floor line, skirting and desk legs must agree |
+| 2026-10-21 | Sound | `SoundSynth` generates four WAV buffers in code (chalk, strain tone, chime, thud); `SoundPlayer` wraps AVAudioPlayer | Decided against shipping any audio files at all, so the package stays tiny and fully offline. Chose to make strain audible only while squinting |
+| 2026-10-21 | Copy scene | `PencilCanvas` (PKCanvasView wrapper) and `CopyView` | Decided this scene must have no squint gesture, because by row 7 squinting has already failed on screen |
+| 2026-10-21 | Script | Suggested wording for the row 7 hint and the ending | Supplied the real event the scene is built on: a maths lesson, an equation he could not read, squinting until his eyes hurt, then asking the boy next to him |
+| 2026-10-21 | Mechanic | `Act.squintGain` scaling relief per row (1.0 / 0.72 / 0.38) | Decided that squinting should stop working in the last row rather than merely weaken |
 
 ## Note for reviewers
 

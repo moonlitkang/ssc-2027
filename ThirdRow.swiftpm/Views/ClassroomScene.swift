@@ -245,9 +245,9 @@ struct ClassroomScene: View {
         ]
 
         return VStack(spacing: cw * 0.030) {
-            ForEach(Array(rows.enumerated()), id: \.offset) { _, row in
-                Text(row.0)
-                    .font(.system(size: cw * row.1, weight: .bold, design: .monospaced))
+            ForEach(0..<5, id: \.self) { index in
+                Text(rows[index].0)
+                    .font(.system(size: cw * rows[index].1, weight: .bold, design: .monospaced))
             }
         }
         .foregroundColor(AppTheme.ink.opacity(0.70))
