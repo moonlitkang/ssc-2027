@@ -1,70 +1,98 @@
 name: build
 
-# macOS runners are not assignable on this account (see project handover report).
-# Kept for later; runs only when triggered by hand. Primary CI is codemagic.yaml.
+# Same pipeline as codemagic.yaml, but on GitHub's own macOS runner.
+#
+# macos-15 is deliberate: macos-latest never got assigned on this account,
+# while macos-15 does. The pc-console-app repo proved that, and this repo is
+# public, so Actions minutes are free.
+#
+# The archive step produces an UNSIGNED ipa on purpose. Signing happens locally
+# with Sideloadly and the author's own free Apple ID, which is the only route
+# available without a paid developer account.
 on:
   workflow_dispatch:
 
 jobs:
-  probe:
-    runs-on: macos-latest
+  build:
+    runs-on: macos-15
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
 
-      - name: Diagnostics
+      - name: Toolchain
         run: |
-          echo "--- installed Xcodes ---"
+          xcodebuild -version
+          swift --version
           ls /Applications | grep -i xcode || true
-          echo "--- default ---"
-          xcodebuild -version || true
-          swift --version || true
-
-      - name: List schemes in the app package
-        continue-on-error: true
-        working-directory: ThirdRow.swiftpm
-        run: xcodebuild -list -json || true
 
       - name: Pick an iPad simulator
         id: sim
         run: |
-          SIM=$(xcrun simctl list devices available -j | python3 -c "
-import json,sys
-d=json.load(sys.stdin)['devices']
-names=[x['name'] for k,v in d.items() if 'iOS' in k for x in v if x['name'].startswith('iPad')]
-print(names[0] if names else '')")
+          SIM=$(xcrun simctl list devices available | sed -n 's/^ *\(iPad.*\) ([0-9A-Fa-f-]\{36\}) (.*$/\1/p' | head -1)
           echo "picked: $SIM"
-          echo "sim=$SIM" >> "$GITHUB_OUTPUT"
+          echo "name=$SIM" >> "$GITHUB_OUTPUT"
 
       - name: Build for simulator
-        id: build
-        continue-on-error: true
         working-directory: ThirdRow.swiftpm
         run: |
           xcodebuild -scheme ThirdRow \
-            -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.sim }}" \
+            -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.name }}" \
             -derivedDataPath build \
-            build 2>&1 | tail -80
+            build
 
-      - name: Screenshot
-        continue-on-error: true
+      # Screenshots run before the archive: if archiving fails, the build still
+      # produces something worth looking at.
+      - name: Screenshot every beat
+        working-directory: ThirdRow.swiftpm
         run: |
-          APP=$(find ThirdRow.swiftpm/build/Build/Products -name "ThirdRow.app" -maxdepth 3 | head -1)
-          echo "app bundle: $APP"
-          if [ -z "$APP" ]; then echo "no app bundle, skipping"; exit 0; fi
+          APP=$(find build/Build/Products -name "*.app" -maxdepth 4 | head -1)
+          echo "app: $APP"
           BID=$(plutil -extract CFBundleIdentifier raw "$APP/Info.plist")
-          echo "bundle id: $BID"
-          xcrun simctl boot "${{ steps.sim.outputs.sim }}" || true
-          xcrun simctl bootstatus "${{ steps.sim.outputs.sim }}" -b || true
+          SIM="${{ steps.sim.outputs.name }}"
+          xcrun simctl boot "$SIM" || true
+          xcrun simctl bootstatus "$SIM" -b || true
           xcrun simctl install booted "$APP"
-          xcrun simctl launch booted "$BID"
-          sleep 4
-          xcrun simctl io booted screenshot shot-01.png
-          ls -la shot-01.png
+          for PHASE in intro stage1 stage3 ask copy reveal recap; do
+            xcrun simctl terminate booted "$BID" || true
+            sleep 1
+            xcrun simctl launch booted "$BID" -startAt "$PHASE" || true
+            sleep 4
+            xcrun simctl io booted screenshot "../shot-$PHASE.png" || true
+            echo "captured $PHASE"
+          done
+          ls -la ../shot-*.png
 
-      - name: Upload screenshots
-        if: always()
+      - name: Archive for device without signing
+        working-directory: ThirdRow.swiftpm
+        run: |
+          xcodebuild -scheme ThirdRow \
+            -destination 'generic/platform=iOS' \
+            -archivePath build-device/ThirdRow.xcarchive \
+            -derivedDataPath build-device \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            ONLY_ACTIVE_ARCH=NO \
+            archive
+
+      - name: Wrap into an unsigned ipa
+        run: |
+          APP=$(find ThirdRow.swiftpm/build-device -maxdepth 5 -path "*Applications*" -name "*.app" | head -1)
+          echo "app: $APP"
+          test -n "$APP"
+          echo "bundle id: $(plutil -extract CFBundleIdentifier raw "$APP/Info.plist")"
+          echo "minimum iOS: $(plutil -extract MinimumOSVersion raw "$APP/Info.plist")"
+          rm -rf Payload ThirdRow-unsigned.ipa
+          mkdir -p Payload
+          cp -R "$APP" Payload/
+          zip -qry ThirdRow-unsigned.ipa Payload
+          ls -lh ThirdRow-unsigned.ipa
+
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: screenshots
-          path: shot-*.png
-          if-no-files-found: warn
+          name: thirdrow-unsigned-ipa
+          path: |
+            ThirdRow-unsigned.ipa
+            shot-*.png
+          if-no-files-found: error
