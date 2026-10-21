@@ -4,6 +4,7 @@ import Foundation
 private enum Phase {
     case intro
     case stage(Int)
+    case copy
     case reveal
     case recap
 }
@@ -13,7 +14,7 @@ struct RootView: View {
     @State private var phase: Phase
 
     /// Lets CI jump straight to a beat so each screen can be captured without tapping.
-    /// Usage: launch with `-startAt stage1|stage2|stage3|reveal|recap`.
+    /// Usage: launch with `-startAt stage1|stage2|stage3|copy|reveal|recap`.
     init() {
         var initial: Phase = .intro
         let args = ProcessInfo.processInfo.arguments
@@ -22,6 +23,7 @@ struct RootView: View {
             case "stage1": initial = .stage(0)
             case "stage2": initial = .stage(1)
             case "stage3": initial = .stage(2)
+            case "copy": initial = .copy
             case "reveal": initial = .reveal
             case "recap": initial = .recap
             default: break
@@ -37,23 +39,31 @@ struct RootView: View {
             switch phase {
             case .intro:
                 IntroView {
+                    SoundPlayer.shared.thud()
                     phase = .stage(0)
                 }
 
             case .stage(let index):
                 StageView(
                     eye: eye,
-                    act: Act.all[index],
-                    isLast: index == Act.all.count - 1
+                    act: Act.all[index]
                 ) {
                     if index + 1 < Act.all.count {
                         phase = .stage(index + 1)
                     } else {
-                        phase = .reveal
+                        phase = .copy
                     }
                 }
                 .onAppear {
-                    eye.reset(baseClarity: Act.all[index].baseClarity)
+                    eye.reset(
+                        baseClarity: Act.all[index].baseClarity,
+                        squintGain: Act.all[index].squintGain
+                    )
+                }
+
+            case .copy:
+                CopyView {
+                    phase = .reveal
                 }
 
             case .reveal:

@@ -52,7 +52,7 @@ workflows:
           xcrun simctl boot "$SIM" || true
           xcrun simctl bootstatus "$SIM" -b || true
           xcrun simctl install booted "$APP"
-          for PHASE in intro stage1 stage3 reveal recap; do
+          for PHASE in intro stage1 stage3 copy reveal recap; do
             xcrun simctl terminate booted "$BID" || true
             sleep 1
             if [ "$PHASE" = "intro" ]; then
@@ -60,7 +60,7 @@ workflows:
             else
               xcrun simctl launch booted "$BID" -startAt "$PHASE" || true
             fi
-            if [ "$PHASE" = "reveal" ]; then sleep 2; else sleep 4; fi
+            if [ "$PHASE" = "reveal" ]; then sleep 2; else sleep 5; fi
             xcrun simctl io booted screenshot "shot-$PHASE.png" || true
             echo "captured $PHASE"
           done

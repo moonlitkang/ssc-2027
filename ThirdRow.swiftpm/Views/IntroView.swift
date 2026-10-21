@@ -4,11 +4,11 @@ struct IntroView: View {
     let onStart: () -> Void
 
     var body: some View {
-        VStack(spacing: 18) {
+        VStack(spacing: 16) {
             Spacer()
 
             Text("Third Row")
-                .font(.system(size: 42, weight: .semibold))
+                .font(.system(size: 44, weight: .semibold))
                 .foregroundColor(AppTheme.ink)
 
             Text("Row 7 of 7.")
@@ -21,12 +21,17 @@ struct IntroView: View {
                 .font(.system(size: 15))
                 .foregroundColor(AppTheme.inkSoft)
                 .multilineTextAlignment(.center)
-                .padding(.bottom, 24)
+                .padding(.bottom, 6)
+
+            Text("About three minutes. Sound on.")
+                .font(.system(size: 12))
+                .foregroundColor(AppTheme.inkSoft.opacity(0.8))
+                .padding(.bottom, 22)
 
             Button(action: onStart) {
                 Text("Sit down")
                     .font(.system(size: 17, weight: .semibold))
-                    .frame(maxWidth: .infinity)
+                    .frame(maxWidth: 360)
                     .padding(.vertical, 14)
                     .background(AppTheme.ink)
                     .foregroundColor(AppTheme.paper)
@@ -34,6 +39,6 @@ struct IntroView: View {
             }
         }
         .padding(.horizontal, 40)
-        .padding(.vertical, 56)
+        .padding(.vertical, 52)
     }
 }
