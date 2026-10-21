@@ -66,7 +66,7 @@ def check_tree(root):
         m = re.search(r'\.iOS\("?([\d.]+)"?\)', src)
         if m:
             v = m.group(1)
-            add('PASS' if float(v.split('.')[0]) >= 17 else 'FAIL', '包结构', f'最低 iOS 版本 {v}（建议 17+）')
+            add('PASS' if float(v.split('.')[0]) >= 16 else 'FAIL', '包结构', f'最低 iOS 版本 {v}（需 16+，测试机为 iOS 16.7）')
         if CJK.search(src):
             add('FAIL', '英文规范', 'Package.swift 含中文')
 

@@ -5,7 +5,9 @@ import AppleProductTypes
 let package = Package(
     name: "ThirdRow",
     platforms: [
-        .iOS("17.0")
+        // 16.0 rather than 17.0: the author's own iPhone runs iOS 16.7 and has to
+        // be able to sideload this. Nothing in the code needs an iOS 17 API.
+        .iOS("16.0")
     ],
     products: [
         .iOSApplication(

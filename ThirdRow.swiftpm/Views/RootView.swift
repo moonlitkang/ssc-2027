@@ -4,7 +4,9 @@ import Foundation
 private enum Phase {
     case intro
     case stage(Int)
-    case copy
+    case ask
+    case copy(AnswerSource)
+    case interlude(AnswerSource)
     case reveal
     case recap
 }
@@ -14,7 +16,7 @@ struct RootView: View {
     @State private var phase: Phase
 
     /// Lets CI jump straight to a beat so each screen can be captured without tapping.
-    /// Usage: launch with `-startAt stage1|stage2|stage3|copy|reveal|recap`.
+    /// Usage: launch with `-startAt stage1|stage2|stage3|ask|copy|interlude|reveal|recap`.
     init() {
         var initial: Phase = .intro
         let args = ProcessInfo.processInfo.arguments
@@ -23,7 +25,9 @@ struct RootView: View {
             case "stage1": initial = .stage(0)
             case "stage2": initial = .stage(1)
             case "stage3": initial = .stage(2)
-            case "copy": initial = .copy
+            case "ask": initial = .ask
+            case "copy": initial = .copy(.classmate)
+            case "interlude": initial = .interlude(.classmate)
             case "reveal": initial = .reveal
             case "recap": initial = .recap
             default: break
@@ -51,7 +55,7 @@ struct RootView: View {
                     if index + 1 < Act.all.count {
                         phase = .stage(index + 1)
                     } else {
-                        phase = .copy
+                        phase = .ask
                     }
                 }
                 .onAppear {
@@ -61,8 +65,18 @@ struct RootView: View {
                     )
                 }
 
-            case .copy:
-                CopyView {
+            case .ask:
+                AskView { source in
+                    phase = .copy(source)
+                }
+
+            case .copy(let source):
+                CopyView(source: source) {
+                    phase = .interlude(source)
+                }
+
+            case .interlude(let source):
+                InterludeView(source: source) {
                     phase = .reveal
                 }
 

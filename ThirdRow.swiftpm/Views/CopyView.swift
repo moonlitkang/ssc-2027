@@ -11,6 +11,7 @@ import PencilKit
 /// That is why this scene has no squint gesture. The player has already learned
 /// that it does not help.
 struct CopyView: View {
+    let source: AnswerSource
     let onNext: () -> Void
 
     @State private var drawing = PKDrawing()
@@ -20,13 +21,18 @@ struct CopyView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Text("He reads it out loud. You write it down.")
-                .font(.system(size: 17, weight: .medium))
-                .foregroundColor(AppTheme.inkSoft)
-                .multilineTextAlignment(.center)
-                .opacity(captionVisible ? 1 : 0)
-                .padding(.top, 24)
-                .padding(.bottom, 16)
+            VStack(spacing: 5) {
+                Text(source.arrival)
+                    .font(.system(size: 17, weight: .medium))
+                    .foregroundColor(AppTheme.inkSoft)
+                Text("You write it down.")
+                    .font(.system(size: 15))
+                    .foregroundColor(AppTheme.inkSoft.opacity(0.85))
+            }
+            .multilineTextAlignment(.center)
+            .opacity(captionVisible ? 1 : 0)
+            .padding(.top, 24)
+            .padding(.bottom, 16)
 
             board
                 .frame(height: 146)

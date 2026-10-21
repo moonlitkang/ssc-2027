@@ -56,7 +56,7 @@ extension Act {
             baseClarity: 0.28,
             squintGain: 0.38,
             hint: "You squint as hard as you can. It stops helping.",
-            advance: "Ask the boy next to you"
+            advance: "Ask someone"
         )
     ]
 

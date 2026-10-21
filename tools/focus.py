@@ -25,10 +25,41 @@ u32.GetWindowThreadProcessId.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.
 u32.ShowWindow.argtypes = [wintypes.HWND, ctypes.c_int]
 u32.SetForegroundWindow.argtypes = [wintypes.HWND]
 u32.BringWindowToTop.argtypes = [wintypes.HWND]
+u32.GetForegroundWindow.restype = wintypes.HWND
+u32.GetWindowThreadProcessId.restype = wintypes.DWORD
+u32.AttachThreadInput.argtypes = [wintypes.DWORD, wintypes.DWORD, wintypes.BOOL]
+u32.keybd_event.argtypes = [wintypes.BYTE, wintypes.BYTE, wintypes.DWORD, ctypes.c_void_p]
 u32.SetWindowPos.argtypes = [
     wintypes.HWND, wintypes.HWND, ctypes.c_int, ctypes.c_int,
     ctypes.c_int, ctypes.c_int, ctypes.c_uint,
 ]
+
+VK_MENU = 0x12
+KEYEVENTF_KEYUP = 0x0002
+
+
+def force_foreground(hwnd):
+    """Windows only lets the process that owns the foreground window change it.
+
+    A synthetic ALT tap clears that lock for the calling process; if it still
+    refuses, attach to the foreground thread's input queue and try again.
+    """
+    u32.keybd_event(VK_MENU, 0, 0, None)
+    u32.SetForegroundWindow(hwnd)
+    u32.keybd_event(VK_MENU, 0, KEYEVENTF_KEYUP, None)
+
+    if u32.GetForegroundWindow() == hwnd:
+        return True
+
+    foreground = u32.GetForegroundWindow()
+    target_thread = u32.GetWindowThreadProcessId(foreground, None)
+    this_thread = ctypes.windll.kernel32.GetCurrentThreadId()
+    u32.AttachThreadInput(this_thread, target_thread, True)
+    u32.BringWindowToTop(hwnd)
+    u32.SetForegroundWindow(hwnd)
+    u32.AttachThreadInput(this_thread, target_thread, False)
+
+    return u32.GetForegroundWindow() == hwnd
 
 
 def visible_windows():
@@ -84,9 +115,10 @@ def main():
         u32.ShowWindow(hwnd, SW_RESTORE)
     u32.SetWindowPos(hwnd, HWND_TOP, 0, 0, 0, 0,
                      SWP_NOSIZE | SWP_NOMOVE | SWP_SHOWWINDOW)
-    u32.BringWindowToTop(hwnd)
-    u32.SetForegroundWindow(hwnd)
-    print(f"focused {pid}: {title}")
+    ok = force_foreground(hwnd)
+    print(f"{'focused' if ok else 'FAILED to focus'} {pid}: {title}")
+    if not ok:
+        sys.exit(1)
 
 
 if __name__ == "__main__":
