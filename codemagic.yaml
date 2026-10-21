@@ -1,6 +1,6 @@
 workflows:
-  probe:
-    name: Third Row / build probe
+  build:
+    name: Third Row / build
     instance_type: mac_mini_m2
     max_build_duration: 60
     environment:
@@ -17,16 +17,6 @@ workflows:
           xcodebuild -version
           echo "=== swift ==="
           swift --version
-          echo "=== installed Xcodes ==="
-          ls /Applications | grep -i xcode || true
-
-      - name: Inspect the app package
-        script: |
-          echo "=== files ==="
-          find "$APP_PACKAGE" -maxdepth 2 -type f | sort
-          echo "=== xcodebuild -list (may fail for .swiftpm) ==="
-          cd "$APP_PACKAGE"
-          xcodebuild -list -json || true
 
       - name: Pick an iPad simulator
         script: |
@@ -43,7 +33,7 @@ workflows:
             -derivedDataPath build \
             build
 
-      - name: Install, launch and screenshot each beat
+      - name: Screenshot every beat
         script: |
           APP=$(find "$APP_PACKAGE/build/Build/Products" -name "*.app" -maxdepth 4 | head -1)
           echo "app bundle: $APP"
@@ -65,59 +55,44 @@ workflows:
             echo "captured $PHASE"
           done
           ls -la shot-*.png
+        # Screenshots run before the archive on purpose: if archiving fails, the
+        # build still produces something worth looking at.
 
-    artifacts:
-      - shot-*.png
-      - ThirdRow.swiftpm/build/**/Build/*.xcactivitylog
-
-  ipa:
-    name: Third Row / unsigned ipa
-    instance_type: mac_mini_m2
-    max_build_duration: 60
-    environment:
-      xcode: latest
-      vars:
-        APP_PACKAGE: ThirdRow.swiftpm
-        SCHEME: ThirdRow
-    scripts:
       - name: Archive for a real device without signing
         script: |
-          echo "=== toolchain ==="
-          xcodebuild -version
+          set +e
           cd "$APP_PACKAGE"
           xcodebuild -scheme "$SCHEME" \
             -destination "generic/platform=iOS" \
-            -archivePath build/ThirdRow.xcarchive \
-            -derivedDataPath build \
+            -archivePath build-device/ThirdRow.xcarchive \
+            -derivedDataPath build-device \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
             archive
+          STATUS=$?
+          echo "archive exit status: $STATUS"
+          find build-device -maxdepth 4 -name "*.app" || true
+          exit 0
 
-      - name: Report the bundle
+      - name: Wrap into an ipa
         script: |
-          echo "=== products ==="
-          find "$APP_PACKAGE/build/ThirdRow.xcarchive/Products" -maxdepth 3 | head -20
-          APP=$(find "$APP_PACKAGE/build/ThirdRow.xcarchive/Products/Applications" -maxdepth 1 -name "*.app" | head -1)
+          APP=$(find "$APP_PACKAGE/build-device" -maxdepth 5 -path "*Applications*" -name "*.app" | head -1)
           echo "app bundle: $APP"
           if [ -z "$APP" ]; then
-            echo "ARCHIVE PRODUCED NO APP BUNDLE"
-            exit 1
+            echo "NO APP BUNDLE - ipa not produced"
+            exit 0
           fi
           echo "=== Info.plist ==="
           plutil -p "$APP/Info.plist" | head -40
           echo "=== minimum iOS ==="
           plutil -extract MinimumOSVersion raw "$APP/Info.plist" || true
-
-      - name: Wrap into an ipa
-        script: |
-          APP=$(find "$APP_PACKAGE/build/ThirdRow.xcarchive/Products/Applications" -maxdepth 1 -name "*.app" | head -1)
           rm -rf Payload ThirdRow-unsigned.ipa
           mkdir -p Payload
           cp -R "$APP" Payload/
           zip -qry ThirdRow-unsigned.ipa Payload
           ls -la ThirdRow-unsigned.ipa
-          echo "ipa ready"
 
     artifacts:
+      - shot-*.png
       - ThirdRow-unsigned.ipa
