@@ -27,13 +27,13 @@ struct PencilCanvas: UIViewRepresentable {
     }
 
     func updateUIView(_ view: PKCanvasView, context: Context) {
-        // PKDrawing is a class but not Equatable, so compare identity instead of
-        // value. Without this guard every SwiftUI redraw would clear the stroke
-        // the player is in the middle of drawing.
-        if context.coordinator.lastSynced !== drawing {
-            view.drawing = drawing
-            context.coordinator.lastSynced = drawing
-        }
+        // Deliberately empty.
+        //
+        // The canvas owns the drawing; the binding only mirrors it outward for
+        // whoever wants to inspect it. Writing the binding back here would wipe
+        // the stroke the player is in the middle of drawing, and comparing the
+        // two values with `!==` does not compile: PKDrawing does not satisfy the
+        // AnyObject constraint in this SDK.
     }
 
     func makeCoordinator() -> Coordinator {
@@ -42,14 +42,12 @@ struct PencilCanvas: UIViewRepresentable {
 
     final class Coordinator: NSObject, PKCanvasViewDelegate {
         var drawing: Binding<PKDrawing>
-        var lastSynced: PKDrawing?
 
         init(drawing: Binding<PKDrawing>) {
             self.drawing = drawing
         }
 
         func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
-            lastSynced = canvasView.drawing
             drawing.wrappedValue = canvasView.drawing
         }
     }
