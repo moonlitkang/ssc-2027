@@ -131,13 +131,15 @@ enum SoundSynth {
         let count = samples.count
         let byteRate = Int(sampleRate) * 2
 
+        // withUnsafeBytes takes a value, not an inout pointer: passing `&le`
+        // here does not compile.
         func append32(_ value: UInt32) {
-            var le = value.littleEndian
-            withUnsafeBytes(of: &le) { data.append(contentsOf: $0) }
+            let le = value.littleEndian
+            withUnsafeBytes(of: le) { data.append(contentsOf: $0) }
         }
         func append16(_ value: UInt16) {
-            var le = value.littleEndian
-            withUnsafeBytes(of: &le) { data.append(contentsOf: $0) }
+            let le = value.littleEndian
+            withUnsafeBytes(of: le) { data.append(contentsOf: $0) }
         }
 
         data.append(contentsOf: Array("RIFF".utf8))
