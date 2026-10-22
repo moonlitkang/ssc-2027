@@ -7,8 +7,8 @@ name: build
 #   "The job was not acquired by Runner of type hosted even after multiple attempts"
 #   "Due to capacity constraints, jobs targeting macOS arm64 runners may
 #    experience longer queue times."
-# So the matrix targets Intel machines instead, both of them, and fail-fast is
-# off so a slow or broken image on one label cannot cancel the other.
+# macos-13 queued for ten minutes without ever being assigned, so the single
+# label that actually works is macos-15-intel — Intel, not arm64.
 #
 # The archive step produces an UNSIGNED ipa on purpose. Signing happens locally
 # with Sideloadly and the author's own free Apple ID, which is the only route
@@ -18,15 +18,9 @@ on:
 
 jobs:
   build:
-    name: build (${{ matrix.label }})
-    runs-on: ${{ matrix.label }}
+    name: build
+    runs-on: macos-15-intel
     timeout-minutes: 45
-    strategy:
-      fail-fast: false
-      matrix:
-        label:
-          - macos-15-intel
-          - macos-13
     steps:
       - uses: actions/checkout@v4
 
@@ -53,8 +47,8 @@ jobs:
             build
 
       # The ipa is the deliverable, so the archive runs before the screenshots.
-      # A cold simulator can take minutes to boot on an Intel runner, and a
-      # screenshot step that hangs must never cost us the ipa.
+      # bootstatus can block for many minutes on a cold Intel simulator, and
+      # that must never cost us the ipa.
       - name: Archive for device without signing
         working-directory: ThirdRow.swiftpm
         run: |
@@ -81,15 +75,14 @@ jobs:
           zip -qry ThirdRow-unsigned.ipa Payload
           ls -lh ThirdRow-unsigned.ipa
 
-      - name: Upload the ipa immediately
+      - name: Upload the ipa
         uses: actions/upload-artifact@v4
         with:
-          name: thirdrow-ipa-${{ matrix.label }}
+          name: thirdrow-ipa
           path: ThirdRow-unsigned.ipa
           if-no-files-found: error
 
-      # Never let a screenshot problem cost us the ipa. The upload above has
-      # already stored it; this step is a bonus and may time out freely.
+      # The ipa is already stored above, so this step may time out freely.
       - name: Screenshot every beat
         continue-on-error: true
         timeout-minutes: 10
@@ -101,7 +94,11 @@ jobs:
           BID=$(plutil -extract CFBundleIdentifier raw "$APP/Info.plist")
           SIM="${{ steps.sim.outputs.name }}"
           xcrun simctl boot "$SIM" || true
-          xcrun simctl bootstatus "$SIM" -b || true
+          # Bounded wait instead of bootstatus -b, which can block forever.
+          for i in $(seq 1 60); do
+            xcrun simctl list devices | grep -q "Booted" && break
+            sleep 2
+          done
           xcrun simctl install booted "$APP"
           for PHASE in intro stage1 stage3 ask copy reveal recap; do
             xcrun simctl terminate booted "$BID" || true
@@ -118,6 +115,6 @@ jobs:
         continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
-          name: thirdrow-shots-${{ matrix.label }}
+          name: thirdrow-shots
           path: shot-*.png
           if-no-files-found: warn
