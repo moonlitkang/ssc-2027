@@ -104,7 +104,12 @@ jobs:
             xcrun simctl terminate booted "$BID" || true
             sleep 1
             xcrun simctl launch booted "$BID" -startAt "$PHASE" || true
-            sleep 4
+            # Four seconds was not enough on a cold simulator: intro, stage3 and
+            # ask all came back as a blank launch screen. Wait for the first
+            # paint, then shoot twice so a late frame overwrites an early one.
+            sleep 6
+            xcrun simctl io booted screenshot "../shot-$PHASE.png" || true
+            sleep 2
             xcrun simctl io booted screenshot "../shot-$PHASE.png" || true
             echo "captured $PHASE"
           done
