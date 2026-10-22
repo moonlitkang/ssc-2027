@@ -13,6 +13,8 @@ import SwiftUI
 struct RevealView: View {
     let onDone: () -> Void
 
+    @ObservedObject private var l10n = L10n.shared
+
     @State private var blur: CGFloat = 11
     @State private var captionOpacity: Double = 0
     @State private var sceneOpacity: Double = 0
@@ -23,7 +25,7 @@ struct RevealView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Text("Then someone handed me a pair of glasses.")
+            Text(l10n.t("Then someone handed me a pair of glasses."))
                 .font(.system(size: 17, weight: .medium))
                 .foregroundColor(AppTheme.inkSoft)
                 .multilineTextAlignment(.center)
@@ -38,12 +40,12 @@ struct RevealView: View {
 
             // Two lines share one slot, in order, so the layout never moves.
             ZStack(alignment: .top) {
-                Text(lastAct.note)
+                Text(l10n.t(lastAct.note))
                     .font(.system(size: 15, weight: .medium, design: .monospaced))
                     .foregroundColor(AppTheme.ink)
                     .opacity(noteOpacity)
 
-                Text("It took less than a second.")
+                Text(l10n.t("It took less than a second."))
                     .font(.system(size: 14))
                     .foregroundColor(AppTheme.inkSoft)
                     .opacity(closingOpacity)

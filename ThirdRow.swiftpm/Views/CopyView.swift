@@ -17,6 +17,8 @@ struct CopyView: View {
     let isLast: Bool
     let onNext: () -> Void
 
+    @ObservedObject private var l10n = L10n.shared
+
     @State private var drawing = PKDrawing()
     @State private var captionVisible = false
 
@@ -25,10 +27,10 @@ struct CopyView: View {
     var body: some View {
         VStack(spacing: 0) {
             VStack(spacing: 5) {
-                Text(source.arrival)
+                Text(l10n.t(source.arrival))
                     .font(.system(size: 17, weight: .medium))
                     .foregroundColor(AppTheme.inkSoft)
-                Text("You write it down.")
+                Text(l10n.t("You write it down."))
                     .font(.system(size: 15))
                     .foregroundColor(AppTheme.inkSoft.opacity(0.85))
             }
@@ -44,7 +46,7 @@ struct CopyView: View {
             notebook
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            Text("You can't check it against the board.")
+            Text(l10n.t("You can't check it against the board."))
                 .font(.system(size: 13))
                 .foregroundColor(AppTheme.inkSoft)
                 .padding(.top, 14)
@@ -53,7 +55,9 @@ struct CopyView: View {
                 SoundPlayer.shared.stopStrain()
                 onNext()
             } label: {
-                Text(isLast ? "Put on your glasses" : "Put the pencil down")
+                Text(isLast
+                     ? l10n.t("Put on your glasses")
+                     : l10n.t("Put the pencil down"))
                     .font(.system(size: 16, weight: .semibold))
                     .padding(.horizontal, 22)
                     .padding(.vertical, 14)

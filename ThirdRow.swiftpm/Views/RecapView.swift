@@ -10,6 +10,8 @@ import SwiftUI
 struct RecapView: View {
     @ObservedObject var eye: EyeState
 
+    @ObservedObject private var l10n = L10n.shared
+
     @State private var numberVisible = false
 
     var body: some View {
@@ -21,31 +23,31 @@ struct RecapView: View {
                 .foregroundColor(AppTheme.ink)
                 .opacity(numberVisible ? 1 : 0)
 
-            Text("seconds of squinting.")
+            Text(l10n.t("seconds of squinting."))
                 .font(.system(size: 16))
                 .foregroundColor(AppTheme.inkSoft)
                 .opacity(numberVisible ? 1 : 0)
                 .padding(.bottom, 40)
 
-            Text("Fifteen pairs of glasses\nin a class of fifty.")
+            Text(l10n.t("Fifteen pairs of glasses\nin a class of fifty."))
                 .font(.system(size: 23, weight: .medium))
                 .foregroundColor(AppTheme.ink)
                 .multilineTextAlignment(.center)
                 .padding(.bottom, 10)
 
-            Text("Mine is one of them.")
+            Text(l10n.t("Mine is one of them."))
                 .font(.system(size: 16, weight: .medium))
                 .foregroundColor(AppTheme.inkSoft)
 
             Spacer(minLength: 20)
 
             VStack(spacing: 6) {
-                Text("Nobody read it off the board.")
+                Text(l10n.t("Nobody read it off the board."))
                     .font(.system(size: 15))
                     .foregroundColor(AppTheme.ink)
                     .multilineTextAlignment(.center)
 
-                Text("We all read it off each other.")
+                Text(l10n.t("We all read it off each other."))
                     .font(.system(size: 15))
                     .foregroundColor(AppTheme.inkSoft)
                     .multilineTextAlignment(.center)

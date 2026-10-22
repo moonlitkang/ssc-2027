@@ -12,6 +12,8 @@ struct StageView: View {
     let act: Act
     let onNext: () -> Void
 
+    @ObservedObject private var l10n = L10n.shared
+
     @State private var captionVisible = false
     @State private var soundOn = true
     @State private var lateLine: String?
@@ -24,7 +26,7 @@ struct StageView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Text(act.caption)
+            Text(l10n.t(act.caption))
                 .font(.system(size: 17, weight: .medium))
                 .foregroundColor(AppTheme.inkSoft)
                 .multilineTextAlignment(.center)
@@ -53,7 +55,7 @@ struct StageView: View {
                     .frame(height: 12)
 
                 HStack {
-                    Text("Eye strain")
+                    Text(l10n.t("Eye strain"))
                         .font(.system(size: 12))
                         .foregroundColor(AppTheme.inkSoft)
 
@@ -68,7 +70,7 @@ struct StageView: View {
                     }
                     .buttonStyle(.plain)
 
-                    Text("Row \(act.row) of 7")
+                    Text(l10n.rowLabel(act.row))
                         .font(.system(size: 12, design: .monospaced))
                         .foregroundColor(AppTheme.inkSoft)
                 }
@@ -77,7 +79,7 @@ struct StageView: View {
 
             // Fixed height on purpose: the late lines are longer than the hint,
             // and the scene above must not jump when one replaces the other.
-            Text(lateLine ?? act.hint)
+            Text(l10n.t(lateLine ?? act.hint))
                 .font(.system(size: 13))
                 .foregroundColor(AppTheme.inkSoft)
                 .multilineTextAlignment(.center)
@@ -93,7 +95,7 @@ struct StageView: View {
                 SoundPlayer.shared.thud()
                 onNext()
             } label: {
-                Text(act.advance)
+                Text(l10n.t(act.advance))
                     .font(.system(size: 16, weight: .semibold))
                     .padding(.horizontal, 22)
                     .padding(.vertical, 14)

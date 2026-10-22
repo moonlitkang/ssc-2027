@@ -14,6 +14,8 @@ struct AskView: View {
     let round: Int
     let onChoose: (AnswerSource) -> Void
 
+    @ObservedObject private var l10n = L10n.shared
+
     @State private var visible = false
 
     private var options: [AnswerSource] {
@@ -21,7 +23,9 @@ struct AskView: View {
     }
 
     private var title: String {
-        round == 1 ? "You can't read it. So you ask." : "He couldn't read it either. So you ask someone else."
+        round == 1
+            ? l10n.t("You can't read it. So you ask.")
+            : l10n.t("He couldn't read it either. So you ask someone else.")
     }
 
     var body: some View {
@@ -34,7 +38,7 @@ struct AskView: View {
                 .multilineTextAlignment(.center)
                 .opacity(visible ? 1 : 0)
 
-            Text("Anyone will do.")
+            Text(l10n.t("Anyone will do."))
                 .font(.system(size: 14))
                 .foregroundColor(AppTheme.inkSoft)
                 .opacity(visible ? 1 : 0)
@@ -46,7 +50,7 @@ struct AskView: View {
                         SoundPlayer.shared.thud()
                         onChoose(source)
                     } label: {
-                        Text(source.button)
+                        Text(l10n.t(source.button))
                             .font(.system(size: 16, weight: .medium))
                             .frame(maxWidth: 360)
                             .padding(.vertical, 15)

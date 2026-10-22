@@ -11,10 +11,14 @@ struct InterludeView: View {
     let source: AnswerSource
     let onDone: () -> Void
 
+    @ObservedObject private var l10n = L10n.shared
+
     @State private var visible = 0
 
+    /// Translate first, then split: the table keys are the whole two-line
+    /// sentence, not its halves.
     private var lines: [String] {
-        source.afterword.components(separatedBy: "\n")
+        l10n.t(source.afterword).components(separatedBy: "\n")
     }
 
     var body: some View {

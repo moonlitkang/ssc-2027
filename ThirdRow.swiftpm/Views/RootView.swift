@@ -13,6 +13,7 @@ private enum Phase {
 
 struct RootView: View {
     @StateObject private var eye = EyeState()
+    @ObservedObject private var l10n = L10n.shared
     @State private var phase: Phase
 
     /// How many people you end up asking. Two is the honest number: the first
@@ -103,6 +104,28 @@ struct RootView: View {
             case .recap:
                 RecapView(eye: eye)
             }
+        }
+        // The language switch lives above every screen, in one place, so no
+        // scene has to know it exists. English stays the default; this only
+        // ever moves if the person holding the phone asks it to.
+        .overlay(alignment: .topTrailing) {
+            Button {
+                l10n.toggle()
+            } label: {
+                Text(l10n.toggleLabel)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundColor(AppTheme.inkSoft)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(AppTheme.paper.opacity(0.85))
+                    .overlay(
+                        Capsule().strokeBorder(AppTheme.ink.opacity(0.14), lineWidth: 1)
+                    )
+                    .clipShape(Capsule())
+            }
+            .buttonStyle(.plain)
+            .padding(.top, 10)
+            .padding(.trailing, 14)
         }
     }
 }
