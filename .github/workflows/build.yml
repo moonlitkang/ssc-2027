@@ -1,10 +1,14 @@
 name: build
 
-# Same pipeline as codemagic.yaml, but on GitHub's own macOS runner.
+# Same pipeline as codemagic.yaml, but on GitHub's own macOS runners.
 #
-# macos-15 is deliberate: macos-latest never got assigned on this account,
-# while macos-15 does. The pc-console-app repo proved that, and this repo is
-# public, so Actions minutes are free.
+# Runner labels are not cosmetic here. macos-15 is an arm64 machine, and this
+# account repeatedly failed to acquire one:
+#   "The job was not acquired by Runner of type hosted even after multiple attempts"
+#   "Due to capacity constraints, jobs targeting macOS arm64 runners may
+#    experience longer queue times."
+# So the matrix targets Intel machines instead, both of them, and fail-fast is
+# off so a slow or broken image on one label cannot cancel the other.
 #
 # The archive step produces an UNSIGNED ipa on purpose. Signing happens locally
 # with Sideloadly and the author's own free Apple ID, which is the only route
@@ -14,16 +18,24 @@ on:
 
 jobs:
   build:
-    runs-on: macos-15
-    timeout-minutes: 40
+    name: build (${{ matrix.label }})
+    runs-on: ${{ matrix.label }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        label:
+          - macos-15-intel
+          - macos-13
     steps:
       - uses: actions/checkout@v4
 
       - name: Toolchain
         run: |
+          sw_vers
+          uname -m
           xcodebuild -version
           swift --version
-          ls /Applications | grep -i xcode || true
 
       - name: Pick an iPad simulator
         id: sim
@@ -40,13 +52,15 @@ jobs:
             -derivedDataPath build \
             build
 
-      # Screenshots run before the archive: if archiving fails, the build still
-      # produces something worth looking at.
+      # Never let a screenshot problem cost us the ipa. The archive below is
+      # the deliverable; the shots are a bonus.
       - name: Screenshot every beat
+        continue-on-error: true
         working-directory: ThirdRow.swiftpm
         run: |
           APP=$(find build/Build/Products -name "*.app" -maxdepth 4 | head -1)
           echo "app: $APP"
+          test -n "$APP"
           BID=$(plutil -extract CFBundleIdentifier raw "$APP/Info.plist")
           SIM="${{ steps.sim.outputs.name }}"
           xcrun simctl boot "$SIM" || true
@@ -91,8 +105,8 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: thirdrow-unsigned-ipa
+          name: thirdrow-${{ matrix.label }}
           path: |
             ThirdRow-unsigned.ipa
             shot-*.png
-          if-no-files-found: error
+          if-no-files-found: warn
