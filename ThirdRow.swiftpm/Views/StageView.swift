@@ -1,5 +1,12 @@
 import SwiftUI
 
+/// One row of the room, and the only mechanic in the piece.
+///
+/// The way out is withheld until the player has actually looked, and the price
+/// is paid in seconds of squinting rather than in taps: 1.5 seconds in the
+/// third row, thirteen in the last. Tapping faster changes nothing, which is
+/// the point — the last row is supposed to cost you something before it lets
+/// you give up and ask a person.
 struct StageView: View {
     @ObservedObject var eye: EyeState
     let act: Act
@@ -7,6 +14,13 @@ struct StageView: View {
 
     @State private var captionVisible = false
     @State private var soundOn = true
+    @State private var lateLine: String?
+    @State private var revealed = 0
+    @State private var canLeave = false
+
+    /// squintedSeconds is cumulative across the whole run, so each act measures
+    /// from where it started.
+    @State private var baseline: Double = 0
 
     var body: some View {
         VStack(spacing: 0) {
@@ -30,6 +44,7 @@ struct StageView: View {
                         .onEnded { _ in
                             eye.endSquint()
                             SoundPlayer.shared.stopStrain()
+                            updateProgress()
                         }
                 )
 
@@ -60,13 +75,18 @@ struct StageView: View {
             }
             .padding(.top, 20)
 
-            Text(act.hint)
+            // Fixed height on purpose: the late lines are longer than the hint,
+            // and the scene above must not jump when one replaces the other.
+            Text(lateLine ?? act.hint)
                 .font(.system(size: 13))
                 .foregroundColor(AppTheme.inkSoft)
                 .multilineTextAlignment(.center)
-                .padding(.top, 14)
+                .lineSpacing(3)
+                .frame(minHeight: 46, alignment: .top)
+                .padding(.top, 12)
                 .padding(.horizontal, 8)
 
+            // Kept in the layout from the start so nothing shifts when it fades in.
             Button {
                 eye.endSquint()
                 SoundPlayer.shared.stopStrain()
@@ -82,28 +102,53 @@ struct StageView: View {
                     .foregroundColor(AppTheme.paper)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
             }
-            .padding(.top, 12)
+            .opacity(canLeave ? 1 : 0)
+            .disabled(!canLeave)
+            .padding(.top, 10)
             .padding(.bottom, 26)
         }
         .padding(.horizontal, 34)
         .onAppear {
             captionVisible = false
+            lateLine = nil
+            revealed = 0
+            canLeave = act.requiredSquint <= 0
+            baseline = eye.squintedSeconds
             withAnimation(.easeIn(duration: 0.45)) { captionVisible = true }
+
+            // strain changes five times a second while holding, which is a
+            // free heartbeat: no timer needed to watch the clock.
             eye.onStrainChange = { level in
                 SoundPlayer.shared.setStrain(level)
+                updateProgress()
             }
-            SoundPlayer.shared.startChalk()
+
+            // The board is written once, as the scene opens.
+            SoundPlayer.shared.board(distance: act.distance)
         }
         .onDisappear {
             SoundPlayer.shared.stopStrain()
         }
     }
 
+    private func updateProgress() {
+        let held = eye.squintedSeconds - baseline
+        let thresholds = act.lineThresholds
+
+        if revealed < act.lateLines.count, held >= thresholds[revealed] {
+            revealed += 1
+            withAnimation(.easeInOut(duration: 0.55)) {
+                lateLine = act.lateLines[revealed - 1]
+            }
+        }
+
+        if held >= act.requiredSquint && !canLeave {
+            withAnimation(.easeIn(duration: 0.5)) { canLeave = true }
+        }
+    }
+
     private func toggleSound() {
         soundOn.toggle()
         SoundPlayer.shared.setEnabled(soundOn)
-        if soundOn {
-            SoundPlayer.shared.startChalk()
-        }
     }
 }

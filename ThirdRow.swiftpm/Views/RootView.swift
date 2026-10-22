@@ -15,8 +15,17 @@ struct RootView: View {
     @StateObject private var eye = EyeState()
     @State private var phase: Phase
 
+    /// How many people you end up asking. Two is the honest number: the first
+    /// answer turns out to be second-hand, so you try once more, and the second
+    /// answer is no better. Raising this lengthens the middle of the piece by
+    /// roughly half a minute per extra person.
+    private let askRounds = 2
+
+    /// Who has already been asked, so the same door is not offered twice.
+    @State private var asked: Set<AnswerSource> = []
+
     /// Lets CI jump straight to a beat so each screen can be captured without tapping.
-    /// Usage: launch with `-startAt stage1|stage2|stage3|ask|copy|interlude|reveal|recap`.
+    /// Usage: launch with `-startAt stage1|stage2|stage3|ask|ask2|copy|interlude|reveal|recap`.
     init() {
         var initial: Phase = .intro
         let args = ProcessInfo.processInfo.arguments
@@ -25,7 +34,7 @@ struct RootView: View {
             case "stage1": initial = .stage(0)
             case "stage2": initial = .stage(1)
             case "stage3": initial = .stage(2)
-            case "ask": initial = .ask
+            case "ask", "ask2": initial = .ask
             case "copy": initial = .copy(.classmate)
             case "interlude": initial = .interlude(.classmate)
             case "reveal": initial = .reveal
@@ -44,6 +53,7 @@ struct RootView: View {
             case .intro:
                 IntroView {
                     SoundPlayer.shared.thud()
+                    asked = []
                     phase = .stage(0)
                 }
 
@@ -66,18 +76,23 @@ struct RootView: View {
                 }
 
             case .ask:
-                AskView { source in
+                AskView(excluding: asked, round: asked.isEmpty ? 1 : 2) { source in
+                    asked.insert(source)
                     phase = .copy(source)
                 }
 
             case .copy(let source):
-                CopyView(source: source) {
+                CopyView(source: source, isLast: asked.count >= askRounds) {
                     phase = .interlude(source)
                 }
 
             case .interlude(let source):
                 InterludeView(source: source) {
-                    phase = .reveal
+                    if asked.count < askRounds {
+                        phase = .ask
+                    } else {
+                        phase = .reveal
+                    }
                 }
 
             case .reveal:

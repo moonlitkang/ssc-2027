@@ -5,12 +5,19 @@ import SwiftUI
 ///
 /// Deliberately the same classroom as the last act — same seat, same rows of
 /// heads — so only one thing changes on screen. That is the whole point.
+///
+/// The second beat is the small line under the problem. It is the only thing
+/// the glasses actually buy back, and it is deliberately unremarkable: you do
+/// not get your eyesight fixed, you get to read the homework range. Whatever
+/// that line says is the player's business, so the app does not comment on it.
 struct RevealView: View {
     let onDone: () -> Void
 
     @State private var blur: CGFloat = 11
     @State private var captionOpacity: Double = 0
     @State private var sceneOpacity: Double = 0
+    @State private var noteOpacity: Double = 0
+    @State private var closingOpacity: Double = 0
 
     private var lastAct: Act { Act.last }
 
@@ -29,16 +36,24 @@ struct RevealView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .opacity(sceneOpacity)
 
-            Text("It took less than a second.")
-                .font(.system(size: 14))
-                .foregroundColor(AppTheme.inkSoft)
-                .opacity(captionOpacity)
-                .padding(.top, 20)
-                .padding(.bottom, 40)
+            // Two lines share one slot, in order, so the layout never moves.
+            ZStack(alignment: .top) {
+                Text(lastAct.note)
+                    .font(.system(size: 15, weight: .medium, design: .monospaced))
+                    .foregroundColor(AppTheme.ink)
+                    .opacity(noteOpacity)
+
+                Text("It took less than a second.")
+                    .font(.system(size: 14))
+                    .foregroundColor(AppTheme.inkSoft)
+                    .opacity(closingOpacity)
+            }
+            .frame(minHeight: 24, alignment: .top)
+            .padding(.top, 20)
+            .padding(.bottom, 40)
         }
         .padding(.horizontal, 34)
         .onAppear {
-            SoundPlayer.shared.stopChalk()
             withAnimation(.easeOut(duration: 0.35)) { sceneOpacity = 1 }
             withAnimation(.easeOut(duration: 0.8).delay(0.6)) { blur = 0 }
             withAnimation(.easeIn(duration: 0.5).delay(0.4)) { captionOpacity = 1 }
@@ -46,7 +61,16 @@ struct RevealView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.55) {
                 SoundPlayer.shared.chime()
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3.8) {
+
+            // Long after the blur has gone, the small line finally reads.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.6) {
+                withAnimation(.easeIn(duration: 0.9)) { noteOpacity = 1 }
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 5.6) {
+                withAnimation(.easeOut(duration: 0.6)) { noteOpacity = 0 }
+                withAnimation(.easeIn(duration: 0.6)) { closingOpacity = 1 }
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 8.2) {
                 onDone()
             }
         }

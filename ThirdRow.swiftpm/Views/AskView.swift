@@ -4,16 +4,31 @@ import SwiftUI
 ///
 /// Three doors, one corridor. The choice matters to the player and not at all to
 /// the outcome, which is exactly the thing this scene is about.
+///
+/// It comes back a second time, minus whoever you already asked. The first
+/// answer turns out to be a copy of a copy, so of course you try one more
+/// person — and the second answer is no better. That is the whole argument:
+/// asking around is not a way of seeing.
 struct AskView: View {
+    let excluding: Set<AnswerSource>
+    let round: Int
     let onChoose: (AnswerSource) -> Void
 
     @State private var visible = false
+
+    private var options: [AnswerSource] {
+        AnswerSource.allCases.filter { !excluding.contains($0) }
+    }
+
+    private var title: String {
+        round == 1 ? "You can't read it. So you ask." : "He couldn't read it either. So you ask someone else."
+    }
 
     var body: some View {
         VStack(spacing: 0) {
             Spacer()
 
-            Text("You can't read it. So you ask.")
+            Text(title)
                 .font(.system(size: 18, weight: .medium))
                 .foregroundColor(AppTheme.ink)
                 .multilineTextAlignment(.center)
@@ -26,7 +41,7 @@ struct AskView: View {
                 .padding(.top, 8)
 
             VStack(spacing: 12) {
-                ForEach(AnswerSource.allCases) { source in
+                ForEach(options) { source in
                     Button {
                         SoundPlayer.shared.thud()
                         onChoose(source)

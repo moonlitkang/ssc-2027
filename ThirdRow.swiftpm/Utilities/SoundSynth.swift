@@ -11,28 +11,77 @@ enum SoundSynth {
 
     // MARK: - Chalk on a board
 
-    /// Filtered noise with pressure that comes and goes in strokes.
-    /// Looping this under a scene is enough to suggest a lesson already in progress.
-    static func chalk(seconds: Double = 2.4) -> Data {
+    /// The board being written on, once, in a handful of strokes.
+    ///
+    /// The first version of this was a continuous hiss: band noise gated by a
+    /// 1.35 Hz sine, looped forever underneath every scene. Measured, it sat at
+    /// twelve thousand zero crossings a second and read as tape hiss, not
+    /// chalk, because real chalk is a series of dry, separate scratches with
+    /// silence in between. A loop also fills the silences this piece depends on,
+    /// so it is now an event with an end rather than a bed.
+    ///
+    /// `distance` goes 0 at the board to 1 in the last row. It dulls the
+    /// spectrum and drops the level, so the board is heard the way it is seen:
+    /// less of it, the further back you sit.
+    static func board(distance: Double, seconds: Double = 2.2) -> Data {
         let n = Int(sampleRate * seconds)
+        var buffer = [Double](repeating: 0, count: n)
         var noise = Noise()
-        var low = 0.0
-        var high = 0.0
+
+        // A hand does not keep time, so the strokes are placed on an irregular
+        // grid: short scrapes, uneven gaps, uneven pressure.
+        var t = 0.04
+        while t < seconds - 0.26 {
+            let dur = 0.055 + 0.075 * abs(noise.next())
+            let gain = 0.42 + 0.53 * abs(noise.next())
+            let start = Int(t * sampleRate)
+            let length = Int(dur * sampleRate)
+            var low = 0.0
+            var high = 0.0
+
+            for j in 0..<length {
+                let index = start + j
+                if index >= n { break }
+                let tr = Double(j) / sampleRate
+                let attack = min(1.0, tr / 0.003)
+                let envelope = attack * exp(-tr * 24.0)
+                let raw = noise.next()
+                low += (raw - low) * 0.42    // keep everything below ~6 kHz
+                high += (raw - high) * 0.08  // throw away everything below ~1.1 kHz
+                buffer[index] += (low - high) * envelope * gain
+            }
+
+            t += dur + 0.018 + 0.075 * abs(noise.next())
+        }
+
+        // The chalk being put back on the tray: one last, lower, shorter scrape.
+        // Without it the sound stops in mid-air.
+        let tapStart = Int((seconds - 0.17) * sampleRate)
+        if tapStart > 0 && tapStart < n {
+            var dull = 0.0
+            let tapLength = Int(0.12 * sampleRate)
+            for j in 0..<tapLength {
+                let index = tapStart + j
+                if index >= n { break }
+                let tr = Double(j) / sampleRate
+                let raw = noise.next()
+                dull += (raw - dull) * 0.18
+                buffer[index] += dull * exp(-tr * 42.0) * 0.85
+            }
+        }
+
+        // Distance: a duller, quieter board.
+        let alpha = 0.42 - 0.28 * distance
+        let distanceGain = 1.0 - 0.68 * distance
+        var lowpass = 0.0
         var samples = [Double]()
         samples.reserveCapacity(n)
-
-        for i in 0..<n {
-            let t = Double(i) / sampleRate
-            let raw = noise.next()
-            low += (raw - low) * 0.28
-            high += (raw - high) * 0.02
-            let grit = low - high
-
-            let stroke = max(0.0, sin(2 * .pi * 1.35 * t + 0.7))
-            let drift = 0.60 + 0.40 * sin(2 * .pi * 0.41 * t)
-            samples.append(grit * 0.26 * (0.30 + 0.70 * stroke) * drift)
+        for sample in buffer {
+            lowpass += (sample - lowpass) * alpha
+            samples.append(lowpass * distanceGain * 1.05)
         }
-        return wav(from: fadeEdges(samples, fade: 0.08))
+
+        return wav(from: fadeEdges(samples, fade: 0.05))
     }
 
     // MARK: - Pressure behind the eyes

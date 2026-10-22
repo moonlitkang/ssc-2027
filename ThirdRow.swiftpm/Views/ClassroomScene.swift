@@ -201,9 +201,14 @@ struct ClassroomScene: View {
     }
 
     private var boardText: some View {
-        VStack(alignment: .leading, spacing: act.fontSize * 0.30) {
+        // The note is chalked at roughly a third of the problem's size, so the
+        // same blur radius swallows it a full row before it swallows the
+        // problem. That difference is the argument of the second act.
+        VStack(alignment: .leading, spacing: act.fontSize * 0.26) {
             ChalkText(text: act.heading, size: act.fontSize * 0.44, seed: 3)
             ChalkText(text: act.problem, size: act.fontSize, seed: 11, weight: .medium)
+            ChalkText(text: act.note, size: act.fontSize * 0.32, seed: 23)
+                .opacity(0.78)
         }
         .rotationEffect(.degrees(-0.5))
     }

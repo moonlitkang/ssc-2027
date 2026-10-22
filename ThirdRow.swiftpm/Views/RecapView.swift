@@ -3,9 +3,10 @@ import SwiftUI
 /// The ending is deliberately two facts and a question, in that order.
 ///
 /// The numbers are the author's own class, not a national statistic: fifty
-/// students, fifteen pairs of glasses. The last two lines are the part that
-/// matters — asking someone is not the same as being able to see, and nobody
-/// ever asked him either.
+/// students, fifteen pairs of glasses. The last two lines have to hold for
+/// every route the player could have taken — classmate, front row, teacher, in
+/// either order — so they say the one thing that was true in all of them:
+/// nobody in that room got it off the board.
 struct RecapView: View {
     @ObservedObject var eye: EyeState
 
@@ -39,12 +40,12 @@ struct RecapView: View {
             Spacer(minLength: 20)
 
             VStack(spacing: 6) {
-                Text("In the end I asked the boy next to me.\nHe read it out loud.")
+                Text("Nobody read it off the board.")
                     .font(.system(size: 15))
                     .foregroundColor(AppTheme.ink)
                     .multilineTextAlignment(.center)
 
-                Text("I never asked whether he could see it either.")
+                Text("We all read it off each other.")
                     .font(.system(size: 15))
                     .foregroundColor(AppTheme.inkSoft)
                     .multilineTextAlignment(.center)
@@ -53,7 +54,6 @@ struct RecapView: View {
         }
         .padding(.horizontal, 40)
         .onAppear {
-            SoundPlayer.shared.stopChalk()
             SoundPlayer.shared.stopStrain()
             SoundPlayer.shared.thud()
             withAnimation(.easeIn(duration: 0.7).delay(0.2)) { numberVisible = true }

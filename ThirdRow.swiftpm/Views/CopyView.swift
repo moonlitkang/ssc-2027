@@ -12,6 +12,9 @@ import PencilKit
 /// that it does not help.
 struct CopyView: View {
     let source: AnswerSource
+    /// The glasses only arrive after the last person you asked. Until then the
+    /// way forward is a third door, not a fix.
+    let isLast: Bool
     let onNext: () -> Void
 
     @State private var drawing = PKDrawing()
@@ -50,7 +53,7 @@ struct CopyView: View {
                 SoundPlayer.shared.stopStrain()
                 onNext()
             } label: {
-                Text("Put on your glasses")
+                Text(isLast ? "Put on your glasses" : "Put the pencil down")
                     .font(.system(size: 16, weight: .semibold))
                     .padding(.horizontal, 22)
                     .padding(.vertical, 14)
@@ -64,7 +67,6 @@ struct CopyView: View {
         }
         .padding(.horizontal, 34)
         .onAppear {
-            SoundPlayer.shared.stopChalk()
             SoundPlayer.shared.setStrain(0.42)
             withAnimation(.easeIn(duration: 0.45)) { captionVisible = true }
         }

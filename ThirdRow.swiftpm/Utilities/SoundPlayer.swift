@@ -3,17 +3,20 @@ import AVFoundation
 /// Plays the synthesised buffers and owns the audio session.
 ///
 /// A single shared instance, because there are only ever a handful of sounds
-/// and the two loops have to survive view rebuilds: if a player were owned by a
-/// view, every phase change would restart the chalk mid-stroke.
+/// and the strain tone has to survive view rebuilds: if a player were owned by
+/// a view, every phase change would restart it mid-swell.
 final class SoundPlayer {
 
     static let shared = SoundPlayer()
 
-    private var chalkPlayer: AVAudioPlayer?
     private var strainPlayer: AVAudioPlayer?
     private var oneShots: [AVAudioPlayer] = []
     private var prepared = false
     private var enabled = true
+
+    /// The board sound is generated per distance, which costs a few
+    /// milliseconds. Three rows means three variants, so cache them.
+    private var boardBuffers: [Int: Data] = [:]
 
     private init() {}
 
@@ -26,7 +29,6 @@ final class SoundPlayer {
         guard !prepared else { return }
         prepared = true
         configureSession()
-        chalkPlayer = make(SoundSynth.chalk(), loops: -1, volume: 0)
         strainPlayer = make(SoundSynth.strain(), loops: -1, volume: 0)
     }
 
@@ -48,18 +50,20 @@ final class SoundPlayer {
 
     // MARK: - The lesson in progress
 
-    func startChalk(volume: Float = 0.26) {
+    /// The board being written on. One event, then silence: the room is quiet
+    /// afterwards and that quiet is part of the piece.
+    func board(distance: Double) {
         prepareIfNeeded()
-        guard enabled, let player = chalkPlayer else { return }
-        if !player.isPlaying {
-            player.volume = 0
-            player.play()
+        guard enabled else { return }
+        let key = Int((distance * 10).rounded())
+        let data: Data
+        if let cached = boardBuffers[key] {
+            data = cached
+        } else {
+            data = SoundSynth.board(distance: distance)
+            boardBuffers[key] = data
         }
-        player.setVolume(volume, fadeDuration: 0.9)
-    }
-
-    func stopChalk() {
-        chalkPlayer?.setVolume(0, fadeDuration: 0.9)
+        play(data, volume: 0.80)
     }
 
     // MARK: - Squinting
@@ -112,7 +116,6 @@ final class SoundPlayer {
         if value {
             prepareIfNeeded()
         } else {
-            chalkPlayer?.stop()
             strainPlayer?.stop()
         }
     }
