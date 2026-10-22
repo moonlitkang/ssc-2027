@@ -52,30 +52,9 @@ jobs:
             -derivedDataPath build \
             build
 
-      # Never let a screenshot problem cost us the ipa. The archive below is
-      # the deliverable; the shots are a bonus.
-      - name: Screenshot every beat
-        continue-on-error: true
-        working-directory: ThirdRow.swiftpm
-        run: |
-          APP=$(find build/Build/Products -name "*.app" -maxdepth 4 | head -1)
-          echo "app: $APP"
-          test -n "$APP"
-          BID=$(plutil -extract CFBundleIdentifier raw "$APP/Info.plist")
-          SIM="${{ steps.sim.outputs.name }}"
-          xcrun simctl boot "$SIM" || true
-          xcrun simctl bootstatus "$SIM" -b || true
-          xcrun simctl install booted "$APP"
-          for PHASE in intro stage1 stage3 ask copy reveal recap; do
-            xcrun simctl terminate booted "$BID" || true
-            sleep 1
-            xcrun simctl launch booted "$BID" -startAt "$PHASE" || true
-            sleep 4
-            xcrun simctl io booted screenshot "../shot-$PHASE.png" || true
-            echo "captured $PHASE"
-          done
-          ls -la ../shot-*.png
-
+      # The ipa is the deliverable, so the archive runs before the screenshots.
+      # A cold simulator can take minutes to boot on an Intel runner, and a
+      # screenshot step that hangs must never cost us the ipa.
       - name: Archive for device without signing
         working-directory: ThirdRow.swiftpm
         run: |
@@ -102,11 +81,43 @@ jobs:
           zip -qry ThirdRow-unsigned.ipa Payload
           ls -lh ThirdRow-unsigned.ipa
 
-      - name: Upload
+      - name: Upload the ipa immediately
         uses: actions/upload-artifact@v4
         with:
-          name: thirdrow-${{ matrix.label }}
-          path: |
-            ThirdRow-unsigned.ipa
-            shot-*.png
+          name: thirdrow-ipa-${{ matrix.label }}
+          path: ThirdRow-unsigned.ipa
+          if-no-files-found: error
+
+      # Never let a screenshot problem cost us the ipa. The upload above has
+      # already stored it; this step is a bonus and may time out freely.
+      - name: Screenshot every beat
+        continue-on-error: true
+        timeout-minutes: 10
+        working-directory: ThirdRow.swiftpm
+        run: |
+          APP=$(find build/Build/Products -name "*.app" -maxdepth 4 | head -1)
+          echo "app: $APP"
+          test -n "$APP"
+          BID=$(plutil -extract CFBundleIdentifier raw "$APP/Info.plist")
+          SIM="${{ steps.sim.outputs.name }}"
+          xcrun simctl boot "$SIM" || true
+          xcrun simctl bootstatus "$SIM" -b || true
+          xcrun simctl install booted "$APP"
+          for PHASE in intro stage1 stage3 ask copy reveal recap; do
+            xcrun simctl terminate booted "$BID" || true
+            sleep 1
+            xcrun simctl launch booted "$BID" -startAt "$PHASE" || true
+            sleep 4
+            xcrun simctl io booted screenshot "../shot-$PHASE.png" || true
+            echo "captured $PHASE"
+          done
+          ls -la ../shot-*.png
+
+      - name: Upload the screenshots
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: thirdrow-shots-${{ matrix.label }}
+          path: shot-*.png
           if-no-files-found: warn
