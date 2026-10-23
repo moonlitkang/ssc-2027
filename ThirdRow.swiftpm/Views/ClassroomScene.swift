@@ -197,7 +197,7 @@ struct ClassroomScene: View {
 
                 boardText(w: w)
                     .padding(.horizontal, boardW * 0.07)
-                    .blur(radius: defocus.radius(at: Defocus.Distance.board, width: w))
+                    .blur(radius: defocus.radius(at: act.boardDistance, width: w))
             }
             .frame(width: boardW, height: boardH)
             .padding(4)

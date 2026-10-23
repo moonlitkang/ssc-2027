@@ -95,6 +95,7 @@ final class L10n: ObservableObject {
         "You can still make out the problem. The line under it is gone.": "题目还看得出轮廓。下面那行没了。",
         "You lean forward until your chair lifts off the floor. You sit back.": "你往前倾，椅子后腿翘了起来。你坐回去。",
         "The shapes get bigger. They don't get sharper.": "字形变大了。没有变清楚。",
+        "You moved up two rows in November. In December the seat went to someone else.": "十一月你往前挪了两排。十二月，那个座位给了别人。",
         "You try again. Your eyes water.": "你又试了一次。眼睛发酸。",
         "You stop trying.": "你不再试了。",
 

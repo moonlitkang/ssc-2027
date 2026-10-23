@@ -23,9 +23,9 @@ final class EyeState: ObservableObject {
     /// How much of the squint is still doing anything. It starts at 1 and
     /// decays while the hold continues, because a slit aperture is not a thing
     /// a face can hold: the muscle tires and the tear film breaks up on a
-    /// stare. This is why the last act can say "you try again, your eyes water,
-    /// you stop" and be describing the actual screen — without it, holding
-    /// longer only ever made the board clearer.
+    /// stare. Without it, holding longer only ever made the board clearer, and
+    /// the last act's line about the shapes growing without getting sharper
+    /// was describing a screen that did not exist.
     @Published var sustain: Double = 1
 
     /// The act's refractive error, in dioptres, positive for myopia. It grows

@@ -106,8 +106,12 @@ struct Defocus: Equatable {
 
     /// Distances used by the drawing, in metres, measured from the player's
     /// seat. Kept together so the room and the model cannot drift apart.
+    ///
+    /// The board is not here: how far away it is changes with the act, so it
+    /// lives on `Act.boardDistance`. Everything else is at a fixed distance
+    /// from wherever you are sitting, which is why the wall chart and the heads
+    /// in front never move.
     enum Distance {
-        static let board: Double = 6.0
         static let wallChart: Double = 5.4
         static let teacherDesk: Double = 3.0
         static let headsAhead: Double = 1.8

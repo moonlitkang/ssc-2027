@@ -117,7 +117,7 @@ struct CopyView: View {
                 sphericalError: act.sphericalError,
                 pupilMM: Optics.dilatedPupilMM
             )
-            .radius(at: Defocus.Distance.board, width: canvas)
+            .radius(at: act.boardDistance, width: canvas)
 
             ZStack {
                 RoundedRectangle(cornerRadius: 4)

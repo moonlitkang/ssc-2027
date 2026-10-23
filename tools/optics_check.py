@@ -10,11 +10,10 @@ import sys
 PPRAD = 766 / (2 * 0.35)
 DILATED = 5.0
 SQUINT = 2.4
-BOARD = 6.0
 
 
-def radius(pupil_mm, s):
-    defocus = max(0.0, s - 1.0 / BOARD)
+def radius(pupil_mm, s, board):
+    defocus = max(0.0, s - 1.0 / board)
     return (pupil_mm / 1000.0) * defocus * PPRAD / 2
 
 
@@ -22,7 +21,7 @@ def pupil(relief):
     return DILATED - (DILATED - SQUINT) * relief
 
 
-def sim(hold_seconds, start, rate, floor, s_error, strain_rate=0.055):
+def sim(hold_seconds, start, rate, floor, s_error, board, strain_rate=0.055):
     """Integrate the same tick() the app runs, at 30 Hz."""
     dt = 1.0 / 30.0
     spent = 0.0
@@ -39,42 +38,47 @@ def sim(hold_seconds, start, rate, floor, s_error, strain_rate=0.055):
         t += dt
         if mi < len(marks) and t >= marks[mi]:
             out.append((marks[mi], sustain, strain, pupil(sustain),
-                        radius(pupil(sustain), s_error + strain * 0.35)))
+                        radius(pupil(sustain), s_error + strain * 0.35, board)))
             mi += 1
     return out
 
 
-def table(title, start, rate, floor, s_error, font, note_scale=0.32, label=""):
+def table(title, start, rate, floor, s_error, board, font, note_scale=0.32, label=""):
     print(f"\n{title}  (relief for {start}s, then {rate}/s down to {floor}, S={s_error})")
     print(f"{'t':>6} {'sustain':>8} {'strain':>7} {'pupil':>6} {'r':>6} {'r/problem':>10} {'r/note':>8}")
-    for t, sus, st, p, r in sim(13.0, start, rate, floor, s_error):
+    for t, sus, st, p, r in sim(13.0, start, rate, floor, s_error, board):
         print(f"{t:6.2f} {sus:8.3f} {st:7.3f} {p:6.3f} {r:6.3f} {r/font:10.3f} {r/(font*note_scale):8.3f}")
     print(f"  {label}")
 
 
-def rest(act_s, font, note_scale=0.32):
-    r = radius(DILATED, act_s)
+def rest(act_s, board, font, note_scale=0.32):
+    r = radius(DILATED, act_s, board)
     return r, r / font, r / (font * note_scale)
 
 
 if __name__ == "__main__":
     print("=== resting states (no squint) ===")
-    print(f"{'act':>6} {'S':>5} {'r':>6} {'r/font':>8} {'r/note':>8}")
-    for name, s, font in [("row3", 0.50, 40), ("row5", 1.50, 31), ("row7", 2.75, 20)]:
-        r, a, b = rest(s, font)
-        print(f"{name:>6} {s:5.2f} {r:6.3f} {a:8.3f} {b:8.3f}")
+    print(f"{'act':>6} {'seat':>6} {'S':>5} {'r':>6} {'r/font':>8} {'r/note':>8}")
+    for name, s, board, font in [("row3", 0.50, 3.5, 40),
+                                 ("row5", 1.50, 5.0, 31),
+                                 ("row7", 2.75, 6.5, 20)]:
+        r, a, b = rest(s, board, font)
+        print(f"{name:>6} {board:6.1f} {s:5.2f} {r:6.3f} {a:8.3f} {b:8.3f}")
+    print("  moving from row 7 to row 3 at -2.75 D changes r by "
+          f"{(1 - radius(DILATED, 2.75, 3.5) / radius(DILATED, 2.75, 6.5)) * 100:.1f}% "
+          "- the seat is not the problem")
 
     print("\n=== legibility bands ===")
     print("  < 0.13  sharp      0.13-0.22  the boundary      0.22-0.35  gone      >0.35 fog")
     print("  remembered strings read at ~0.25 because memory fills the gaps")
 
-    table("OLD sustain (4s relief, 0.09/s, floor .55)", 4.0, 0.09, 0.55, 2.75, 20,
+    table("OLD sustain (4s relief, 0.09/s, floor .55)", 4.0, 0.09, 0.55, 2.75, 6.5, 20,
           label="row7 at rest is 0.353; row5 at rest is 0.118 (the legibility anchor)")
-    table("NEW sustain (1.5s relief, 0.16/s, floor .42)", 1.5, 0.16, 0.42, 2.75, 20,
+    table("NEW sustain (1.5s relief, 0.16/s, floor .42)", 1.5, 0.16, 0.42, 2.75, 6.5, 20,
           label="row7 at rest is 0.353; row5 at rest is 0.118")
 
     print("\n=== act 2 must stay readable while squinting ===")
-    table("act 2 (relief for 6s, floor .72, S=1.50)", 6.0, 0.16, 0.72, 1.50, 31,
+    table("act 2 (relief for 6s, floor .72, S=1.50)", 6.0, 0.16, 0.72, 1.50, 5.0, 31,
           label="its line says the problem is still there and the small line is not")
 
     print("\n=== tapping instead of holding (0.4s down / 0.3s up) ===")
@@ -95,7 +99,7 @@ if __name__ == "__main__":
             sustain = min(1.0, sustain + dt * 1.5)
             if cycle > 0.7:
                 cycle = 0.0
-    r = radius(pupil(sustain), 2.75 + min(1.0, 5.2 * 0.055) * 0.35)
+    r = radius(pupil(sustain), 2.75 + min(1.0, 5.2 * 0.055) * 0.35, 6.5)
     print(f"  OLD: after 13 s of tapping, sustain={sustain:.3f} r/font={r/20:.3f} "
           f"(honest hold gives 0.277)")
 
@@ -114,6 +118,6 @@ if __name__ == "__main__":
             sustain = min(1.0, sustain + dt * 0.15)
             if cycle > 0.7:
                 cycle = 0.0
-    r = radius(pupil(sustain), 2.75 + min(1.0, 5.2 * 0.055) * 0.35)
+    r = radius(pupil(sustain), 2.75 + min(1.0, 5.2 * 0.055) * 0.35, 6.5)
     print(f"  NEW: after 13 s of tapping, sustain={sustain:.3f} r/font={r/20:.3f} "
           f"(honest hold gives 0.303)")

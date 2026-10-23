@@ -26,6 +26,20 @@ struct Act: Identifiable {
     /// room; December is not, from anywhere.
     let sphericalError: Double
 
+    /// How far the board is from this act's seat, in metres.
+    ///
+    /// This used to be a single constant, `Defocus.Distance.board`, and the seat
+    /// therefore had no effect on the picture at all — three acts, three rows,
+    /// one distance. The room only ever changed by drawing more heads and
+    /// shrinking the chalk, which meant the title of the piece was not true of
+    /// the model underneath it.
+    ///
+    /// What the honest number shows is worth knowing: moving from the last row
+    /// to the third at −2.75 D changes the blur by about five per cent. The seat
+    /// is not the problem, and no amount of moving seats makes it one. December
+    /// is the act where that gets said out loud.
+    let boardDistance: Double
+
     let hint: String
 
     /// One line per threshold, shown in order as the player keeps looking.
@@ -84,6 +98,7 @@ extension Act {
             note: "Ex. 1-8, odd only",
             fontSize: 40,
             sphericalError: 0.50,
+            boardDistance: 3.5,
             // Not "to squint". At half a dioptre, squinting moves the blur on
             // a forty-point line by one point and a bit — there is nothing to
             // see, and there is not meant to be. This act teaches the gesture;
@@ -106,6 +121,7 @@ extension Act {
             note: "Ex. 1-8, odd only",
             fontSize: 31,
             sphericalError: 1.50,
+            boardDistance: 5.0,
             hint: "Hold the board to squint.",
             // "The problem comes back" used to carry the whole act, and it
             // stopped being true once the last act changed questions. What is
@@ -139,10 +155,16 @@ extension Act {
             // perspective.
             fontSize: 20,
             sphericalError: 2.75,
+            boardDistance: 6.5,
             hint: "Hold the board to squint.",
             lateLines: [
                 "The shapes get bigger. They don't get sharper.",
-                "You try again. Your eyes water.",
+                // The seat, said once, in the act where it has stopped being
+                // an answer. Moving up two rows is real — it is worth about a
+                // fortnight at this prescription — and the fortnight is not the
+                // point. The point is that the front row is a finite resource
+                // and you are not the only short-sighted person in the room.
+                "You moved up two rows in November. In December the seat went to someone else.",
                 "You stop trying."
             ],
             requiredSquint: 13.0,
