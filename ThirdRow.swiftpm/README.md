@@ -18,14 +18,18 @@ while, and it costs more than it gives.
 
 About three minutes, in four movements:
 
-1. **Row 3, September** — hold the board to squint. It helps, because the
-   prescription is still mild.
+1. **Row 3, September** — hold the board and nothing happens, because at half a
+   dioptre there is nothing to press away. This act teaches the gesture, not the
+   relief; the line above the button is the only thing that has to change, and
+   it says so. Honest, and it is why the next act lands.
 2. **Row 5, October** — the problem comes back into focus, the line under it does
    not. The note is chalked smaller, so the same blur swallows it first. That is
    the real first loss in myopia: detail goes before subject.
-3. **Row 7, December** — squinting gives less than a third of what it did, and a
-   third of a large blur is still a large blur. The way out appears only after
-   thirteen seconds of actually looking.
+3. **Row 7, December** — squinting gives back about half of a blur that is now
+   nearly three dioptres wide, and it gives it back for a second and a half
+   before the muscle and the tear film give up. The question is a different one
+   this month, so the answer cannot be remembered off the board. The way out
+   appears only after thirteen seconds of actually looking.
 4. **Ask** — you ask someone, twice, because the first answer turns out to be a
    copy of a copy.
 5. **Copy** — they read it out loud and you write it down with a pencil. The board
@@ -61,11 +65,32 @@ Two consequences the old hand-tuned version could not produce:
   is that fact, and without it the model would claim a −0.5 D eye cannot read the
   paper in front of it, which is backwards.
 
-Squinting narrows the pupil from 5.0 mm to 1.8 mm, so it relieves *every* row by
-the same fraction — about 64% of the blur, everywhere. It stops working at row 7
-not because it becomes weaker but because two-thirds of 7 points is still 2.5
-points of blur against 22-point chalk. No difficulty curve was written; the
-geometry does it.
+Squinting narrows the pupil from 5.0 mm to 2.4 mm. Not 1.8: a slit is a worse
+stop than its gap suggests — diffraction off both lids, and a pupil only partly
+covered — and at 1.8 the relief was strong enough that row seven, squinted, came
+out as legible as row five is at rest. That number is the difference between the
+last act working and quietly contradicting itself.
+
+So squinting relieves *every* row by the same fraction, about 52% of the blur,
+everywhere. It stops working at row 7 not because it becomes weaker but because
+half of 7 points is still 3.4 points of blur against 20-point chalk. No
+difficulty curve was written; the geometry does it.
+
+Two more things the model needed, both discovered by testing it rather than by
+reasoning about it:
+
+- **Relief runs out.** A slit is held by a muscle. `Act.reliefSeconds` is how
+  long the press actually does anything, and it is short exactly where the
+  defocus is large: September's is `.infinity` because half a dioptre needs no
+  press at all, October's lasts six seconds, December's is over in one and a
+  half. Without this, holding longer only ever made the board clearer, and the
+  line "they don't get sharper" was describing a screen that did not exist.
+- **It is the accumulated time that tires an eye**, not the length of any one
+  press. The first version decayed against the current press and refilled on
+  release, which made tapping strictly better than holding: 0.4 s down and 0.3 s
+  up kept the relief pinned at full for thirteen seconds. The decay now counts
+  the seconds squinted in the act — the same number the progress bar counts — so
+  a duty cycle buys nothing.
 
 Strain adds a small amount of defocus on top, and decays far more slowly than it
 accumulates, which is why letting go leaves you worse off than not having tried.
