@@ -55,6 +55,10 @@ struct RootView: View {
             // Thirteen seconds in: the relief has bottomed out. Without this
             // beat the act was signed off on the strength of its clearest frame.
             case "stage3fog": initial = .stage(2); squintFromStart = 13.0
+            // Four seconds in: the first line has landed and the relief has
+            // gone. This is the beat where the sentence and the screen have to
+            // agree, so it needs a frame of its own.
+            case "stage3first": initial = .stage(2); squintFromStart = 4.0
             case "ask", "ask2": initial = .ask
             case "copy": initial = .copy(.classmate)
             case "interlude": initial = .interlude(.classmate)

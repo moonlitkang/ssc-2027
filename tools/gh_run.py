@@ -122,9 +122,14 @@ def cmd_logs(rid=None):
     out = []
     for j in jobs:
         try:
-            blob = call("GET", f"/repos/{OWNER}/{REPO}/actions/jobs/{j['id']}/logs", raw=True)
+            # Same redirect problem as the artifacts: the log blob is served
+            # from storage that rejects a request carrying a GitHub token.
+            blob = download(f"/repos/{OWNER}/{REPO}/actions/jobs/{j['id']}/logs")
         except SystemExit as e:
             out.append(f"--- {j['name']}: no log ({e})")
+            continue
+        except urllib.error.HTTPError as e:
+            out.append(f"--- {j['name']}: no log (HTTP {e.code})")
             continue
         out.append(f"===== {j['name']} =====")
         out.append(blob.decode("utf-8", "replace"))
@@ -136,9 +141,11 @@ def cmd_logs(rid=None):
 
 
 def download(url, retries=3):
-    """Artifact zips redirect to blob storage, and Azure rejects a request that
-    arrives with a GitHub bearer token attached. So this one follows redirects
-    without the Authorization header."""
+    """Artifact zips and job logs redirect to blob storage, and Azure rejects a
+    request that arrives with a GitHub bearer token attached. So this one follows
+    redirects without the Authorization header."""
+    if not url.startswith("http"):
+        url = API + url
     for attempt in range(retries):
         try:
             req = urllib.request.Request(url)
