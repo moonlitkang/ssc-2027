@@ -74,6 +74,15 @@ Two consequences the old hand-tuned version could not produce:
   power to focus on something near; what it cannot do is relax. The `max(0, …)`
   is that fact, and without it the model would claim a −0.5 D eye cannot read the
   paper in front of it, which is backwards.
+- **The room recedes.** The board, the eye chart, the timetable and the
+  teacher's desk are fixed objects at fixed places, so the share of the view
+  each one fills falls as the reciprocal of the distance to it. The scene scales
+  all of them by `referenceBoardDistance / boardDistance`, and the chalk with
+  them — writing at a fixed size on a fixed board also occupies less of the view
+  the further back you sit. `fontSize` is 40 for all three acts and means "forty
+  points at three and a half metres". By December the board is 54% of the size it
+  was in September, which is the same thing as saying the seat has moved without
+  the room following you forward.
 
 Squinting narrows the pupil from 5.0 mm to 2.4 mm. Not 1.8: a slit is a worse
 stop than its gap suggests — diffraction off both lids, and a pupil only partly
