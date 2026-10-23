@@ -19,20 +19,27 @@ struct RecapView: View {
     /// a zero would be a fact about the tester, not about the story.
     var ink: InkMetrics = .empty
 
+    /// Capture only. A screenshot run never squints, so without this the ending
+    /// is photographed reading "0 seconds" and "0 hours a year", which is the
+    /// one screen where a zero looks like a bug rather than a result.
+    var captureSeconds: Double?
+
     @ObservedObject private var l10n = L10n.shared
 
     @State private var numberVisible = false
 
+    private var seconds: Double { captureSeconds ?? eye.squintedSeconds }
+
     /// 1200 lessons a year, divided into the seconds already counted.
     private var hoursPerYear: Int {
-        max(0, Int(eye.squintedSeconds / 3.0))
+        max(0, Int(seconds / 3.0))
     }
 
     var body: some View {
         VStack(spacing: 0) {
             Spacer(minLength: 12)
 
-            Text("\(Int(eye.squintedSeconds))")
+            Text("\(Int(seconds))")
                 .font(.system(size: 68, weight: .semibold, design: .monospaced))
                 .foregroundColor(AppTheme.ink)
                 .opacity(numberVisible ? 1 : 0)

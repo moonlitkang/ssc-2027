@@ -77,6 +77,11 @@ struct RootView: View {
         captureInk = args.contains("-ink")
             ? InkMetrics(strokes: 7, lengthCM: 24, pauses: 5, pauseSeconds: 9.4)
             : nil
+        if let k = args.firstIndex(of: "-squintTotal"),
+           k + 1 < args.count,
+           let total = Double(args[k + 1]) {
+            captureSeconds = total
+        }
         startsSquinting = squintFromStart
         _phase = State(initialValue: initial)
     }
@@ -89,6 +94,10 @@ struct RootView: View {
 
     /// Set by `-ink`. Stands in for a drawing the screenshot run cannot make.
     private var captureInk: InkMetrics?
+
+    /// Set by `-squintTotal`. Three digits on purpose, so a layout that only
+    /// fits two does not pass.
+    private var captureSeconds: Double?
 
     var body: some View {
         ZStack {
@@ -158,7 +167,7 @@ struct RootView: View {
                 }
 
             case .recap:
-                RecapView(eye: eye, ink: captureInk ?? ink)
+                RecapView(eye: eye, ink: captureInk ?? ink, captureSeconds: captureSeconds)
                     .pageWidth()
             }
         }

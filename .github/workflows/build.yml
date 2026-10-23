@@ -123,7 +123,7 @@ jobs:
             # be photographed; without it the last screen is only ever verified
             # by hand.
             EXTRA=""
-            [ "$PHASE" = "recap" ] && EXTRA="-ink"
+            [ "$PHASE" = "recap" ] && EXTRA="-ink -squintTotal 187"
             # --terminate-running-process kills whatever is on screen and starts
             # a fresh one in a single atomic step. A separate `simctl terminate`
             # races with the previous launch: when that launch is slow, terminate
