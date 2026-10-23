@@ -23,10 +23,18 @@ struct InkMetrics: Equatable {
     let strokes: Int
     let lengthCM: Int
 
-    /// Gaps longer than this are counted as stops rather than as the natural
-    /// lift between letters. Lifting the pencil to start the next character
-    /// takes a third of a second at most; looking up takes one to three.
-    static let pauseThreshold: TimeInterval = 0.8
+    /// Gaps longer than this are counted as a look up rather than as the
+    /// natural movement of a hand.
+    ///
+    /// The number matters more than it looks. Measured against a real copying
+    /// pace: lifting the pencil between letters is 0.05–0.25 s, sliding the
+    /// hand along the line or starting a new one is 0.5–1.5 s, and actually
+    /// looking up at the board takes one to three seconds. The first version
+    /// used 0.8 s, which sits inside the *moving* band — it would have counted
+    /// the hand travelling to the next line as a look at the board, and inflated
+    /// every count by however many lines the player wrote. 1.5 s is the bottom
+    /// of the band that only a look can produce.
+    static let pauseThreshold: TimeInterval = 1.5
 
     /// How many times the pencil came off the page for longer than a breath.
     let pauses: Int

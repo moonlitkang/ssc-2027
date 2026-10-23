@@ -159,23 +159,26 @@ extension Act {
             hint: "Hold the board to squint.",
             lateLines: [
                 "The shapes get bigger. They don't get sharper.",
-                // The seat, said once, in the act where it has stopped being
-                // an answer. Moving up two rows is real — it is worth about a
-                // fortnight at this prescription — and the fortnight is not the
-                // point. The point is that the front row is a finite resource
-                // and you are not the only short-sighted person in the room.
-                "You moved up two rows in November. In December the seat went to someone else.",
+                // The seat, said once, in the act where it has stopped being an
+                // answer. The wording matters: the visible movement across the
+                // three acts is backwards (row 3 → 5 → 7), so a line claiming
+                // you moved *up* would contradict the picture and the corner
+                // label at the same time. "Again" is the whole accusation —
+                // seats get reassigned, and the last row is where you end up.
+                "In November they moved your seat again. In December it was the last row.",
                 "You stop trying."
             ],
             requiredSquint: 13.0,
-            // Two seconds of relief, then it goes. The first line lands at 2.0
-            // s because that is when the blur starts coming back, not at 3.25
-            // s where even spacing would have put it — a line that says "they
-            // don't get sharper" has to arrive while they are visibly getting
-            // softer, or it is describing a screen nobody is looking at.
+            // The relief lasts a second and a half, and the first line has to
+            // land after it has gone — not while it is still working. At 2.0 s
+            // the blur is 3.71 against a resting 7.10, i.e. the board is 48%
+            // clearer than it was, and "they don't get sharper" is a lie on the
+            // screen it appears over. At 3.5 s the radius has climbed back to
+            // 0.235 of a glyph, which is past the legible boundary; that is the
+            // first honest moment to say it.
             reliefSeconds: 1.5,
             reliefFloor: 0.42,
-            lineTimes: [2.0, 5.0, 9.0],
+            lineTimes: [3.5, 6.5, 10.0],
             distance: 0.85,
             advance: "Ask someone"
         )

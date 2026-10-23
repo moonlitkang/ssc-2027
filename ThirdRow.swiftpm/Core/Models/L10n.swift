@@ -64,10 +64,19 @@ final class L10n: ObservableObject {
         return "\(strokes) \(unit) and \(centimetres) centimetres of pencil,\nand you checked none of it."
     }
 
-    /// The count of times the pencil came off the page for longer than a
-    /// breath. It is stated flatly and without interpretation: the player was
-    /// there, they know what they were doing during those gaps.
+    /// The count of times the pencil came off the page long enough to be a look
+    /// rather than a movement. It is stated flatly and without interpretation:
+    /// the player was there, they know what they were doing during those gaps.
+    ///
+    /// Zero is reported too, and not as a failure — writing the whole thing
+    /// without stopping means the board was never consulted, which is its own
+    /// kind of copying.
     func pauseLine(pauses: Int) -> String {
+        if pauses == 0 {
+            return language == .zh
+                ? "你一口气写完，笔没有停过。"
+                : "You wrote it in one go.\nYour pencil never stopped."
+        }
         if language == .zh {
             return "你的笔停了 \(pauses) 次。黑板一次都没变。"
         }
@@ -106,7 +115,7 @@ final class L10n: ObservableObject {
         "You can still make out the problem. The line under it is gone.": "题目还看得出轮廓。下面那行没了。",
         "You lean forward until your chair lifts off the floor. You sit back.": "你往前倾，椅子后腿翘了起来。你坐回去。",
         "The shapes get bigger. They don't get sharper.": "字形变大了。没有变清楚。",
-        "You moved up two rows in November. In December the seat went to someone else.": "十一月你往前挪了两排。十二月，那个座位给了别人。",
+        "In November they moved your seat again. In December it was the last row.": "十一月学校又给你换了座位。十二月，是最后一排。",
         "You try again. Your eyes water.": "你又试了一次。眼睛发酸。",
         "You stop trying.": "你不再试了。",
 

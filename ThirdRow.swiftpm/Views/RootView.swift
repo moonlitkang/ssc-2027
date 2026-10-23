@@ -71,11 +71,13 @@ struct RootView: View {
         // Capture only. The ending has three measured lines and two of them
         // come from a drawing, which a screenshot run cannot make — so without
         // this the only way to see them is to play the piece by hand and
-        // screenshot the last screen yourself. The numbers are deliberately
-        // plausible rather than round, so a layout that only fits a two-digit
-        // count does not pass.
+        // screenshot the last screen yourself.
+        //
+        // The numbers are what a real copying attempt looks like at this
+        // threshold: a dozen strokes for an equation and a half, and two gaps
+        // long enough to be a look at the board rather than a hand moving.
         captureInk = args.contains("-ink")
-            ? InkMetrics(strokes: 7, lengthCM: 24, pauses: 5, pauseSeconds: 9.4)
+            ? InkMetrics(strokes: 12, lengthCM: 31, pauses: 2, pauseSeconds: 4.6)
             : nil
         if let k = args.firstIndex(of: "-squintTotal"),
            k + 1 < args.count,

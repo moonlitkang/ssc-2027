@@ -62,18 +62,19 @@ struct RecapView: View {
 
                 // The pauses, which are the only part of this that is a
                 // measurement rather than a description. A gap in the
-                // timestamps is a moment the player was not writing, and in
-                // this scene there is exactly one other thing to do. It is
-                // reported without being explained — the explanation is the
-                // scene they just played.
-                if ink.pauses > 0 {
-                    Text(l10n.pauseLine(pauses: ink.pauses))
-                        .font(.system(size: 15))
-                        .foregroundColor(AppTheme.inkSoft)
-                        .multilineTextAlignment(.center)
-                        .padding(.top, 2)
-                        .opacity(numberVisible ? 1 : 0)
-                }
+                // timestamps longer than a hand movement is a moment the player
+                // was not writing, and in this scene there is exactly one other
+                // thing to do. It is reported without being explained — the
+                // explanation is the scene they just played.
+                //
+                // Shown even when it is zero: writing straight through means the
+                // board was never consulted, and that is worth saying too.
+                Text(l10n.pauseLine(pauses: ink.pauses))
+                    .font(.system(size: 15))
+                    .foregroundColor(AppTheme.inkSoft)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, 2)
+                    .opacity(numberVisible ? 1 : 0)
             }
 
             VStack(spacing: 3) {
