@@ -46,6 +46,14 @@ final class L10n: ObservableObject {
         language == .zh ? "第 \(row) 排 / 共 7 排" : "Row \(row) of 7"
     }
 
+    /// The school-year conversion. Six lessons a day, five days a week, forty
+    /// weeks — so one second of squinting per lesson is 1/3 of an hour a year.
+    func hoursPerYear(_ hours: Int) -> String {
+        language == .zh
+            ? "照这样算，一年是 \(hours) 小时。"
+            : "At that rate, \(hours) hours a year."
+    }
+
     func t(_ english: String) -> String {
         guard language == .zh else { return english }
         return L10n.table[english] ?? english
@@ -106,9 +114,17 @@ final class L10n: ObservableObject {
 
         // Recap
         "seconds of squinting.": "秒。你一直在眯。",
+        "Six lessons a day, five days a week, forty weeks.": "一天六节课，一周五天，一学年四十周。",
         "Fifteen pairs of glasses\nin a class of fifty.": "五十人的班里，\n十五副眼镜。",
         "Mine is one of them.": "我是其中一副。",
+        "Seventy-one percent of junior high students in China are short-sighted.": "中国初中生的近视率是 71%。",
+        "Source: National Health Commission, 2024.": "数据来源：国家卫生健康委员会，2024。",
         "Nobody read it off the board.": "没有人是自己从黑板上看下来的。",
         "We all read it off each other.": "我们都是互相抄的。",
+        "Nobody in that room thought the room was the problem.": "那间教室里，没有人觉得问题出在教室。",
+
+        // The page you wrote on
+        "What you wrote down.": "你写下来的。",
+        "You didn't write it down.": "你没有写。",
     ]
 }

@@ -84,6 +84,46 @@ enum SoundSynth {
         return wav(from: fadeEdges(samples, fade: 0.05))
     }
 
+    // MARK: - Breathing
+
+    /// A breath in, and a breath out, as two separate events.
+    ///
+    /// This is not ambience. People hold their breath when they try to see
+    /// something, and let it go when they give up, so the sound is tied to the
+    /// press and the release rather than looped underneath. That makes the
+    /// gesture audible without ever competing with the silence between tries.
+    static func breath(inhaling: Bool) -> Data {
+        let seconds = inhaling ? 0.75 : 0.95
+        let n = Int(sampleRate * seconds)
+        var noise = Noise()
+        var low = 0.0
+        var high = 0.0
+        var samples = [Double]()
+        samples.reserveCapacity(n)
+
+        for i in 0..<n {
+            let t = Double(i) / sampleRate
+            let p = min(1.0, t / seconds)
+            let envelope: Double
+            if inhaling {
+                // Air pulled in: builds quickly, then stops rather than fades.
+                let rise = pow(min(1.0, p / 0.55), 1.6)
+                let cutoff = p > 0.86 ? max(0.0, 1.0 - (p - 0.86) / 0.14) : 1.0
+                envelope = rise * cutoff
+            } else {
+                // Let go: starts at full and falls away.
+                envelope = pow(1.0 - p, 1.3) * min(1.0, p / 0.08)
+            }
+
+            let raw = noise.next()
+            low += (raw - low) * (inhaling ? 0.30 : 0.22)
+            high += (raw - high) * 0.05
+            samples.append((low - high) * envelope * (inhaling ? 0.22 : 0.17))
+        }
+
+        return wav(from: fadeEdges(samples, fade: 0.03))
+    }
+
     // MARK: - Pressure behind the eyes
 
     /// Three low tones. Both frequencies complete a whole number of cycles in

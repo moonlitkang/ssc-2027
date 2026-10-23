@@ -41,10 +41,14 @@ struct StageView: View {
                 .gesture(
                     DragGesture(minimumDistance: 0)
                         .onChanged { _ in
+                            // onChanged fires many times per press; only the
+                            // first one is an actual intake of breath.
+                            if !eye.isHolding { SoundPlayer.shared.breathe(inhaling: true) }
                             eye.beginSquint()
                         }
                         .onEnded { _ in
                             eye.endSquint()
+                            SoundPlayer.shared.breathe(inhaling: false)
                             SoundPlayer.shared.stopStrain()
                             updateProgress()
                         }

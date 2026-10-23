@@ -15,7 +15,10 @@ struct CopyView: View {
     /// The glasses only arrive after the last person you asked. Until then the
     /// way forward is a third door, not a fix.
     let isLast: Bool
-    let onNext: () -> Void
+    /// The page is handed back up on purpose: the last scene shows it again,
+    /// sharp, next to the board that is finally sharp too. Without that, the
+    /// writing would be decoration.
+    let onNext: (PKDrawing) -> Void
 
     @ObservedObject private var l10n = L10n.shared
 
@@ -53,7 +56,7 @@ struct CopyView: View {
 
             Button {
                 SoundPlayer.shared.stopStrain()
-                onNext()
+                onNext(drawing)
             } label: {
                 Text(isLast
                      ? l10n.t("Put on your glasses")

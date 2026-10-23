@@ -17,6 +17,7 @@ final class SoundPlayer {
     /// The board sound is generated per distance, which costs a few
     /// milliseconds. Three rows means three variants, so cache them.
     private var boardBuffers: [Int: Data] = [:]
+    private var breathBuffers: [Int: Data] = [:]
 
     private init() {}
 
@@ -46,6 +47,25 @@ final class SoundPlayer {
         player.volume = volume
         player.prepareToPlay()
         return player
+    }
+
+    // MARK: - Breathing
+
+    /// Held while squinting, released when the player lets go. Cached, because
+    /// a player can press several times in a row and generating the buffer on
+    /// every press would show up as a stutter.
+    func breathe(inhaling: Bool) {
+        prepareIfNeeded()
+        guard enabled else { return }
+        let key = inhaling ? 1 : 0
+        let data: Data
+        if let cached = breathBuffers[key] {
+            data = cached
+        } else {
+            data = SoundSynth.breath(inhaling: inhaling)
+            breathBuffers[key] = data
+        }
+        play(data, volume: inhaling ? 0.55 : 0.45)
     }
 
     // MARK: - The lesson in progress
