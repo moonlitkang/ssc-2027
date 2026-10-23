@@ -21,14 +21,21 @@ An AI assistant (a large language model used through a coding tool) helped with:
 
 | Date | Area | What the AI produced | What the author changed or decided |
 |---|---|---|---|
-| 2026-10-20 | Project structure | `Package.swift`, folder layout, initial SwiftUI view skeletons | Chose Swift Playgrounds app package over a plain Xcode project; chose iOS 17 deployment target |
+| 2026-10-20 | Project structure | `Package.swift`, folder layout, initial SwiftUI view skeletons | Chose Swift Playgrounds app package over a plain Xcode project. Target later lowered to iOS 16 because the author's own phone runs 16.7 and has to be able to sideload the build |
 | 2026-10-20 | Mechanic | `EyeState` counter loop with strain/squint accumulation | Set the tuning values (squint gain, strain rate, recovery rate) so recovery is much slower than damage |
 | 2026-10-20 | Copy | English strings for the three rows and the recap | Replaced generic placeholder text with the author's own numbers and phrasing |
 | 2026-10-21 | Classroom | Rewrote `ClassroomScene`: skirting board, ceiling tubes, wall timetable, thicker desk legs, shoulders on the silhouettes, `ChalkText` for letter-by-letter chalk wobble | Rejected the first drawn classroom as a wireframe. Wrote the rule that nothing floats and the floor line, skirting and desk legs must agree |
 | 2026-10-21 | Sound | `SoundSynth` generates four WAV buffers in code (chalk, strain tone, chime, thud); `SoundPlayer` wraps AVAudioPlayer | Decided against shipping any audio files at all, so the package stays tiny and fully offline. Chose to make strain audible only while squinting |
 | 2026-10-21 | Copy scene | `PencilCanvas` (PKCanvasView wrapper) and `CopyView` | Decided this scene must have no squint gesture, because by row 7 squinting has already failed on screen |
 | 2026-10-21 | Script | Suggested wording for the row 7 hint and the ending | Supplied the real event the scene is built on: a maths lesson, an equation he could not read, squinting until his eyes hurt, then asking the boy next to him |
-| 2026-10-21 | Mechanic | `Act.squintGain` scaling relief per row (1.0 / 0.72 / 0.38) | Decided that squinting should stop working in the last row rather than merely weaken |
+| 2026-10-21 | Mechanic | `Act.squintGain` scaling relief per row (1.0 / 0.72 / 0.38) | Decided that squinting should stop working in the last row rather than merely weaken. **This row is superseded on 2026-10-23**: the per-row gain was replaced by an aperture model, after the author rejected a curve that was tuned rather than derived |
+| 2026-10-21 | Script | Three routes for "ask someone", a second round of asking, and the two closing lines | Approved the reversal that the first answer was itself copied from someone else, and that no route is allowed to produce a readable board |
+| 2026-10-22 | Sound | Two one-shot breath buffers (intake, release) wired to the press and the lift | Asked for breathing, and rejected it as background ambience — it had to be tied to the gesture, not laid under the scene |
+| 2026-10-22 | Copy scene | `RevealView` renders the player's own `PKDrawing` as a card at the end | Rejected an earlier version in which writing the answer down changed nothing. Demanded the page come back later, because otherwise the act was decoration |
+| 2026-10-22 | Ending | Converted the measured squint seconds into hours per school year (6 lessons × 5 days × 40 weeks), plus the national figure with its source | Supplied the closing argument that the room, not the eyes, was built wrong. Line left in after review, flagged as the only editorial claim in the piece |
+| 2026-10-22 | Language | `L10n` table of 50 strings and the corner switch | Set the rule that English stays the default for judges and Chinese is an explicit choice, never a response to device locale |
+| 2026-10-23 | Layout | `pageWidth()` capping the text-only screens at 560 points; recap spacing | Found the iPad layout unacceptable after seeing real screenshots: three buttons stretched across the whole screen and an ending spread over 800 points of paper |
+| 2026-10-23 | Mechanic | `Optics`: pupil diameter, refractive error in dioptres, per-surface distances, and the `max(0, S − 1/d)` accommodation floor | Requested a technical core that is derived rather than tuned, after the author set the goal of a higher placing. Reviewed and kept the `max(0, …)` after it corrected a first version in which a near-sighted eye could not read its own desk |
 
 ## Note for reviewers
 
