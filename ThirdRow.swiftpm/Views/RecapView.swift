@@ -49,8 +49,7 @@ struct RecapView: View {
             .multilineTextAlignment(.center)
             .padding(.top, 14)
             .opacity(numberVisible ? 1 : 0)
-
-            Spacer(minLength: 14)
+            .padding(.bottom, 46)
 
             VStack(spacing: 5) {
                 Text(l10n.t("Fifteen pairs of glasses\nin a class of fifty."))
@@ -75,8 +74,7 @@ struct RecapView: View {
             }
             .padding(.top, 16)
             .padding(.horizontal, 6)
-
-            Spacer(minLength: 16)
+            .padding(.bottom, 40)
 
             VStack(spacing: 7) {
                 Text(l10n.t("Nobody read it off the board."))

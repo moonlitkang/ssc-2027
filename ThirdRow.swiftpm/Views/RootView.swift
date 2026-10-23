@@ -61,6 +61,7 @@ struct RootView: View {
                     asked = []
                     phase = .stage(0)
                 }
+                .pageWidth()
 
             case .stage(let index):
                 StageView(
@@ -85,6 +86,7 @@ struct RootView: View {
                     asked.insert(source)
                     phase = .copy(source)
                 }
+                .pageWidth()
 
             case .copy(let source):
                 CopyView(source: source, isLast: asked.count >= askRounds) { page in
@@ -101,14 +103,18 @@ struct RootView: View {
                         phase = .reveal
                     }
                 }
+                .pageWidth()
 
             case .reveal:
+                // Deliberately not page-capped: this beat is the room coming
+                // back into focus, and the room is a picture.
                 RevealView(page: written) {
                     phase = .recap
                 }
 
             case .recap:
                 RecapView(eye: eye)
+                    .pageWidth()
             }
         }
         // The language switch lives above every screen, in one place, so no
@@ -134,4 +140,21 @@ struct RootView: View {
             .padding(.trailing, 14)
         }
     }
+}
+
+/// Keeps the written screens to a column.
+///
+/// On a phone this does nothing. On an iPad it is the difference between a page
+/// and a noticeboard: 17-point type spread across 834 points of paper reads as
+/// an unfinished settings screen, and the three-way question at the end turned
+/// into a row of full-width list buttons. The room and the notebook stay
+/// full-bleed — they are pictures, and pictures want the width.
+private struct PageWidth: ViewModifier {
+    func body(content: Content) -> some View {
+        content.frame(maxWidth: 560)
+    }
+}
+
+private extension View {
+    func pageWidth() -> some View { modifier(PageWidth()) }
 }

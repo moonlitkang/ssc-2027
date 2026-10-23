@@ -117,12 +117,21 @@ jobs:
             sleep 1
             xcrun simctl launch booted "$BID" -startAt "$PHASE" || true
             # Four seconds was not enough on a cold simulator: intro, stage3 and
-            # ask all came back as a blank launch screen. Wait for the first
-            # paint, then shoot twice so a late frame overwrites an early one.
-            sleep 7
-            xcrun simctl io booted screenshot "../shot-$PHASE.png" || true
-            sleep 2
-            xcrun simctl io booted screenshot "../shot-$PHASE.png" || true
+            # ask all came back as a blank launch screen.
+            #
+            # Reveal is the exception and needs its own timing: it advances by
+            # itself at 9.6s, and a screenshot costs about a second on this
+            # runner, so the old "shoot at 7s and again at 9s" pattern landed on
+            # the recap twice. One shot at 5s catches the page card instead.
+            if [ "$PHASE" = "reveal" ]; then
+              sleep 5
+              xcrun simctl io booted screenshot "../shot-$PHASE.png" || true
+            else
+              sleep 7
+              xcrun simctl io booted screenshot "../shot-$PHASE.png" || true
+              sleep 2
+              xcrun simctl io booted screenshot "../shot-$PHASE.png" || true
+            fi
             echo "captured $PHASE"
           done
           ls -la ../shot-*.png
