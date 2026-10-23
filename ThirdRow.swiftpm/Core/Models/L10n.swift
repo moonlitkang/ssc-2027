@@ -54,6 +54,16 @@ final class L10n: ObservableObject {
             : "At that rate, \(hours) hours a year."
     }
 
+    /// The second measured fact on the ending card, and the only one the player
+    /// made with their hands.
+    func inkLine(strokes: Int, centimetres: Int) -> String {
+        if language == .zh {
+            return "\(strokes) 笔、\(centimetres) 厘米铅笔，你一笔也没有核对。"
+        }
+        let unit = strokes == 1 ? "stroke" : "strokes"
+        return "\(strokes) \(unit) and \(centimetres) centimetres of pencil,\nand you checked none of it."
+    }
+
     func t(_ english: String) -> String {
         guard language == .zh else { return english }
         return L10n.table[english] ?? english

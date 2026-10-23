@@ -29,6 +29,10 @@ struct RootView: View {
     /// The page the player actually wrote on. Shown again, sharp, at the end.
     @State private var written: PKDrawing?
 
+    /// Counted off the drawing the moment it is handed over, so the ending can
+    /// report something the player actually did.
+    @State private var ink = InkMetrics.empty
+
     /// Lets CI jump straight to a beat so each screen can be captured without tapping.
     /// Usage: launch with `-startAt stage1|stage2|stage3|ask|ask2|copy|interlude|reveal|recap`.
     /// Add `-hold` alongside it to keep a self-advancing beat on screen.
@@ -94,6 +98,7 @@ struct RootView: View {
                 CopyView(source: source, isLast: asked.count >= askRounds) { page in
                     // Keep the last page. It is what the reveal hands back.
                     written = page
+                    ink = InkMetrics(drawing: page)
                     phase = .interlude(source)
                 }
 
@@ -115,7 +120,7 @@ struct RootView: View {
                 }
 
             case .recap:
-                RecapView(eye: eye)
+                RecapView(eye: eye, ink: ink)
                     .pageWidth()
             }
         }

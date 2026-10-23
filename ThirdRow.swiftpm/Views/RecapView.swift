@@ -14,6 +14,11 @@ import SwiftUI
 struct RecapView: View {
     @ObservedObject var eye: EyeState
 
+    /// What the pencil did, counted from the drawing itself. Empty when the
+    /// player never wrote anything, in which case the line is not shown at all —
+    /// a zero would be a fact about the tester, not about the story.
+    var ink: InkMetrics = .empty
+
     @ObservedObject private var l10n = L10n.shared
 
     @State private var numberVisible = false
@@ -36,6 +41,18 @@ struct RecapView: View {
                 .font(.system(size: 15))
                 .foregroundColor(AppTheme.inkSoft)
                 .opacity(numberVisible ? 1 : 0)
+
+            // The second measured thing, and the only one the player made with
+            // their hands. Both of these numbers were counted, neither was
+            // written into the app.
+            if !ink.isEmpty {
+                Text(l10n.inkLine(strokes: ink.strokes, centimetres: ink.lengthCM))
+                    .font(.system(size: 15))
+                    .foregroundColor(AppTheme.inkSoft)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, 2)
+                    .opacity(numberVisible ? 1 : 0)
+            }
 
             VStack(spacing: 3) {
                 Text(l10n.t("Six lessons a day, five days a week, forty weeks."))
