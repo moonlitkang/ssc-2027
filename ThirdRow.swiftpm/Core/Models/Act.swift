@@ -93,7 +93,12 @@ extension Act {
             heading: "Solve for x:",
             problem: "3x + 7 = 22",
             note: "Ex. 1-8, odd only",
-            fontSize: 22,
+            // Twenty rather than twenty-two: at twenty-two, squinting in the
+            // last row landed on the same blur-per-glyph as the fifth row at
+            // rest, which is legible in the screenshots — i.e. the mechanic
+            // quietly contradicted the act. Smaller at the back is also just
+            // perspective.
+            fontSize: 20,
             sphericalError: 2.75,
             hint: "Hold the board to squint.",
             lateLines: [

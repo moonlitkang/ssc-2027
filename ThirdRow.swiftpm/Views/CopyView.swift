@@ -57,7 +57,12 @@ struct CopyView: View {
             notebook
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            Text(l10n.t("You can't check it against the board."))
+            // Asking the teacher does not produce something you can read off
+            // the board — it produces a page number. Same dead end, different
+            // shape, so the line has to change with the route.
+            Text(l10n.t(source == .teacher
+                        ? "A page number is not an answer."
+                        : "You can't check it against the board."))
                 .font(.system(size: 13))
                 .foregroundColor(AppTheme.inkSoft)
                 .padding(.top, 14)

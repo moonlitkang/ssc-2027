@@ -99,7 +99,8 @@ final class L10n: ObservableObject {
 
         // Asking
         "You can't read it. So you ask.": "你看不清。于是你问人。",
-        "He couldn't read it either. So you ask someone else.": "他也看不清。于是你换一个人问。",
+        "That answer was second-hand too. So you ask someone else.": "那个答案也是二手抄来的。于是你换一个人问。",
+        "A page number is not an answer.": "一个页码不是答案。",
         "Anyone will do.": "谁都可以。",
         "The boy next to you": "旁边的男生",
         "The girl in front of you": "前排的女生",

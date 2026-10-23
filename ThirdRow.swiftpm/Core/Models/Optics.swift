@@ -40,9 +40,13 @@ enum Optics {
     /// why the board is worse at the back of a dim room than a bright one.
     static let dilatedPupilMM = 5.0
 
-    /// Squinting is a slit, not a smaller circle, but a slit of about 1.8 mm
-    /// across blurs the same amount as a 1.8 mm circle for our purposes.
-    static let squintingPupilMM = 1.8
+    /// Squinting is a slit, not a smaller circle, and a slit is a worse stop
+    /// than its gap suggests: diffraction off both lids, plus a pupil that is
+    /// only partly covered, so the *effective* aperture is nearer 2.4 mm than
+    /// the 1.8 mm the gap measures. That difference matters here — at 1.8 mm the
+    /// relief was so strong that row seven, squinted, came out as legible as
+    /// row five is at rest, which quietly destroyed the third act.
+    static let squintingPupilMM = 2.4
 
     /// Points per radian at a given drawing width.
     static func pointsPerRadian(width: CGFloat) -> Double {

@@ -25,7 +25,7 @@ struct AskView: View {
     private var title: String {
         round == 1
             ? l10n.t("You can't read it. So you ask.")
-            : l10n.t("He couldn't read it either. So you ask someone else.")
+            : l10n.t("That answer was second-hand too. So you ask someone else.")
     }
 
     var body: some View {

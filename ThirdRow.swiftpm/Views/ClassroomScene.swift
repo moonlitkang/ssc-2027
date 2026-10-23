@@ -69,9 +69,12 @@ struct StudentSilhouette: View {
 /// 1. How many rows sit between you and the board grows with the act. Row 3 →
 ///    one row of heads in front. Row 7 → three. The seat change is shown, not
 ///    narrated.
-/// 2. Only the board, the eye chart and the timetable are blurred. Myopia is a
-///    distance problem: the desks in front of you stay sharp. Blurring
-///    everything would just be a filter.
+/// 2. Every surface is blurred by how far away it is, and by nothing else. That
+///    includes the heads in front of you and your own desk, which means at row
+///    seven the front of the room goes soft while the page under your hand stays
+///    readable. An earlier version of this comment claimed the heads stayed
+///    sharp; the code never did that, and the comment was the thing that was
+///    wrong.
 /// 3. Nothing floats. The floor line, the skirting board and the teacher's
 ///    desk legs all agree on where the ground is.
 struct ClassroomScene: View {

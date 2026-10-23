@@ -40,11 +40,15 @@ struct RootView: View {
         var initial: Phase = .intro
         let args = ProcessInfo.processInfo.arguments
         freezeForCapture = args.contains("-hold")
+        var squintFromStart = false
         if let i = args.firstIndex(of: "-startAt"), i + 1 < args.count {
             switch args[i + 1] {
             case "stage1": initial = .stage(0)
             case "stage2": initial = .stage(1)
             case "stage3": initial = .stage(2)
+            // The state the whole mechanic lives in, and the only one a finger
+            // was ever needed for. Captured holding, so it can be looked at.
+            case "stage3squint": initial = .stage(2); squintFromStart = true
             case "ask", "ask2": initial = .ask
             case "copy": initial = .copy(.classmate)
             case "interlude": initial = .interlude(.classmate)
@@ -53,11 +57,15 @@ struct RootView: View {
             default: break
             }
         }
+        startsSquinting = squintFromStart
         _phase = State(initialValue: initial)
     }
 
     /// Set by `-hold`. Only the two beats that advance themselves look at it.
     private var freezeForCapture: Bool
+
+    /// Set by the `stage3squint` capture beat.
+    private var startsSquinting: Bool
 
     var body: some View {
         ZStack {
@@ -75,7 +83,8 @@ struct RootView: View {
             case .stage(let index):
                 StageView(
                     eye: eye,
-                    act: Act.all[index]
+                    act: Act.all[index],
+                    startsSquinting: startsSquinting
                 ) {
                     if index + 1 < Act.all.count {
                         phase = .stage(index + 1)

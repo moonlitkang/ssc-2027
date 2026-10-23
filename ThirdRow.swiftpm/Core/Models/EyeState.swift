@@ -20,6 +20,14 @@ final class EyeState: ObservableObject {
     @Published var isHolding: Bool = false
     @Published var squintedSeconds: Double = 0
 
+    /// How much of the squint is still doing anything. It starts at 1 and
+    /// decays while the hold continues, because a slit aperture is not a thing
+    /// a face can hold: the muscle tires and the tear film breaks up on a
+    /// stare. This is why the last act can say "you try again, your eyes water,
+    /// you stop" and be describing the actual screen — without it, holding
+    /// longer only ever made the board clearer.
+    @Published var sustain: Double = 1
+
     /// The act's refractive error, in dioptres, positive for myopia. It grows
     /// over the term: about half a dioptre in September, nearly three by
     /// December. That growth, not the seat, is what takes the board away.
@@ -31,6 +39,7 @@ final class EyeState: ObservableObject {
 
     private var timer: Timer?
     private var tickCount = 0
+    private var heldFor: Double = 0
 
     init() {
         timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 30.0, repeats: true) { [weak self] _ in
@@ -45,6 +54,9 @@ final class EyeState: ObservableObject {
     private func tick(_ dt: Double) {
         if isHolding {
             squint = min(1.0, squint + dt * 3.0)
+            heldFor += dt
+            // Four seconds of real relief, then it starts slipping away.
+            sustain = max(0.55, 1.0 - max(0.0, heldFor - 4.0) * 0.09)
             strain = min(1.0, strain + dt * 0.055)
             squintedSeconds += dt
             tickCount += 1
@@ -53,14 +65,17 @@ final class EyeState: ObservableObject {
             }
         } else {
             squint = max(0.0, squint - dt * 3.0)
+            heldFor = 0
+            sustain = min(1.0, sustain + dt * 1.5)
             strain = max(0.0, strain - dt * 0.012)
         }
     }
 
     /// 0 = eyes wide open, 1 = lids narrowed to a slit.
     var pupilMM: Double {
-        Optics.dilatedPupilMM
-            - (Optics.dilatedPupilMM - Optics.squintingPupilMM) * squint
+        let relief = squint * sustain
+        return Optics.dilatedPupilMM
+            - (Optics.dilatedPupilMM - Optics.squintingPupilMM) * relief
     }
 
     /// What the room is seen through right now.
@@ -84,5 +99,18 @@ final class EyeState: ObservableObject {
         sphericalError = value
         strain = 0
         squint = 0
+        sustain = 1
+        heldFor = 0
+    }
+
+    /// Test-only, for the capture build: start an act already holding, so the
+    /// squinted state can be photographed. It is the one state the core
+    /// mechanic lives in and the only one CI could never reach, because the
+    /// gesture has to come from a finger.
+    func beginSquintForCapture() {
+        beginSquint()
+        squint = 1
+        heldFor = 0
+        sustain = 1
     }
 }

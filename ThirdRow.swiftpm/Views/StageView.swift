@@ -10,6 +10,10 @@ import SwiftUI
 struct StageView: View {
     @ObservedObject var eye: EyeState
     let act: Act
+
+    /// Capture only: open the act already holding, so the squinted frame exists.
+    var startsSquinting: Bool = false
+
     let onNext: () -> Void
 
     @ObservedObject private var l10n = L10n.shared
@@ -121,6 +125,11 @@ struct StageView: View {
             canLeave = act.requiredSquint <= 0
             baseline = eye.squintedSeconds
             withAnimation(.easeIn(duration: 0.45)) { captionVisible = true }
+
+            if startsSquinting {
+                eye.beginSquintForCapture()
+                SoundPlayer.shared.setStrain(0.4)
+            }
 
             // strain changes five times a second while holding, which is a
             // free heartbeat: no timer needed to watch the clock.
