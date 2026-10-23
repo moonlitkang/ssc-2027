@@ -119,27 +119,21 @@ jobs:
             # finds nothing to kill, the old instance survives, and `launch` only
             # brings it to the front — so the file named "interlude" ends up
             # holding a picture of "ask".
-            xcrun simctl launch --terminate-running-process booted "$BID" -startAt "$PHASE" || true
-            # Timing on this runner is not stable enough for a single shot.
-            # Launch alone has taken anywhere from two to nineteen seconds, and
-            # an early frame is the app's blank pre-first-paint window — pure
-            # white, while every real screen is paper (#F7F5F0). So shoot three
-            # times a few seconds apart and keep the last one.
+            xcrun simctl launch --terminate-running-process booted "$BID" -startAt "$PHASE" -hold || true
+            # -hold keeps the two self-advancing beats (interlude at 6.2s,
+            # reveal at 9.6s) from moving on while this runner takes its time
+            # painting. Without it a slow launch photographs the next screen.
             #
-            # Reveal is the exception: it advances by itself at 9.6s, so it gets
-            # exactly one shot, five seconds in, which is when the page card
-            # appears. Late frames on that beat are the recap.
-            if [ "$PHASE" = "reveal" ]; then
-              sleep 5
-              xcrun simctl io booted screenshot "../shot-$PHASE.png" || true
-            else
-              sleep 8
-              xcrun simctl io booted screenshot "../shot-$PHASE.png" || true
-              sleep 6
-              xcrun simctl io booted screenshot "../shot-$PHASE.png" || true
-              sleep 6
-              xcrun simctl io booted screenshot "../shot-$PHASE.png" || true
-            fi
+            # Three shots, last one wins: launch alone has taken anywhere from
+            # two to nineteen seconds here, and an early frame is the app's
+            # blank pre-first-paint window — pure white, while every real screen
+            # is paper (#F7F5F0).
+            sleep 8
+            xcrun simctl io booted screenshot "../shot-$PHASE.png" || true
+            sleep 6
+            xcrun simctl io booted screenshot "../shot-$PHASE.png" || true
+            sleep 6
+            xcrun simctl io booted screenshot "../shot-$PHASE.png" || true
             echo "captured $PHASE"
           done
           ls -la ../shot-*.png

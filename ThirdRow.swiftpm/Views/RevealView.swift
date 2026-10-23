@@ -17,6 +17,11 @@ struct RevealView: View {
     /// the writing stops being decoration: this is the page you made from
     /// something you could not see, and it is the last thing on screen.
     let page: PKDrawing?
+
+    /// Test-only, same contract as the interlude: `-hold` keeps the beat on
+    /// screen instead of handing over to the ending.
+    var hold: Bool = false
+
     let onDone: () -> Void
 
     @ObservedObject private var l10n = L10n.shared
@@ -94,6 +99,7 @@ struct RevealView: View {
                 withAnimation(.easeIn(duration: 0.6)) { closingOpacity = 1 }
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 9.6) {
+                guard !hold else { return }
                 onDone()
             }
         }

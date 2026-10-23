@@ -9,6 +9,13 @@ import SwiftUI
 /// feel.
 struct InterludeView: View {
     let source: AnswerSource
+
+    /// Test-only. With `-hold` on the command line the screen never advances,
+    /// so a capture taken whenever the simulator finally paints is still this
+    /// beat. Without it, the four seconds it takes this runner to launch can
+    /// swallow the whole six-second window and photograph the next screen.
+    var hold: Bool = false
+
     let onDone: () -> Void
 
     @ObservedObject private var l10n = L10n.shared
@@ -48,8 +55,10 @@ struct InterludeView: View {
                 }
             }
 
-            let hold = 0.25 + 1.35 * Double(lines.count) + 3.2
-            DispatchQueue.main.asyncAfter(deadline: .now() + hold) {
+            // Read every line, then sit on the last one long enough to hurt.
+            let dwell = 0.25 + 1.35 * Double(lines.count) + 3.2
+            guard !hold else { return }
+            DispatchQueue.main.asyncAfter(deadline: .now() + dwell) {
                 onDone()
             }
         }

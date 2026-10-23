@@ -31,9 +31,11 @@ struct RootView: View {
 
     /// Lets CI jump straight to a beat so each screen can be captured without tapping.
     /// Usage: launch with `-startAt stage1|stage2|stage3|ask|ask2|copy|interlude|reveal|recap`.
+    /// Add `-hold` alongside it to keep a self-advancing beat on screen.
     init() {
         var initial: Phase = .intro
         let args = ProcessInfo.processInfo.arguments
+        freezeForCapture = args.contains("-hold")
         if let i = args.firstIndex(of: "-startAt"), i + 1 < args.count {
             switch args[i + 1] {
             case "stage1": initial = .stage(0)
@@ -49,6 +51,9 @@ struct RootView: View {
         }
         _phase = State(initialValue: initial)
     }
+
+    /// Set by `-hold`. Only the two beats that advance themselves look at it.
+    private var freezeForCapture: Bool
 
     var body: some View {
         ZStack {
@@ -96,7 +101,7 @@ struct RootView: View {
                 }
 
             case .interlude(let source):
-                InterludeView(source: source) {
+                InterludeView(source: source, hold: freezeForCapture) {
                     if asked.count < askRounds {
                         phase = .ask
                     } else {
@@ -108,7 +113,7 @@ struct RootView: View {
             case .reveal:
                 // Deliberately not page-capped: this beat is the room coming
                 // back into focus, and the room is a picture.
-                RevealView(page: written) {
+                RevealView(page: written, hold: freezeForCapture) {
                     phase = .recap
                 }
 
