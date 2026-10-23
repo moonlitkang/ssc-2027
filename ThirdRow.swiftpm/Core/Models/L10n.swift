@@ -64,6 +64,17 @@ final class L10n: ObservableObject {
         return "\(strokes) \(unit) and \(centimetres) centimetres of pencil,\nand you checked none of it."
     }
 
+    /// The count of times the pencil came off the page for longer than a
+    /// breath. It is stated flatly and without interpretation: the player was
+    /// there, they know what they were doing during those gaps.
+    func pauseLine(pauses: Int) -> String {
+        if language == .zh {
+            return "你的笔停了 \(pauses) 次。黑板一次都没变。"
+        }
+        let unit = pauses == 1 ? "time" : "times"
+        return "Your pencil stopped \(pauses) \(unit).\nThe board did not change once."
+    }
+
     func t(_ english: String) -> String {
         guard language == .zh else { return english }
         return L10n.table[english] ?? english

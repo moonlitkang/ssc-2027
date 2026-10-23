@@ -52,6 +52,21 @@ struct RecapView: View {
                     .multilineTextAlignment(.center)
                     .padding(.top, 2)
                     .opacity(numberVisible ? 1 : 0)
+
+                // The pauses, which are the only part of this that is a
+                // measurement rather than a description. A gap in the
+                // timestamps is a moment the player was not writing, and in
+                // this scene there is exactly one other thing to do. It is
+                // reported without being explained — the explanation is the
+                // scene they just played.
+                if ink.pauses > 0 {
+                    Text(l10n.pauseLine(pauses: ink.pauses))
+                        .font(.system(size: 15))
+                        .foregroundColor(AppTheme.inkSoft)
+                        .multilineTextAlignment(.center)
+                        .padding(.top, 2)
+                        .opacity(numberVisible ? 1 : 0)
+                }
             }
 
             VStack(spacing: 3) {
