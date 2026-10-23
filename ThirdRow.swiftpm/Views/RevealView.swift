@@ -131,11 +131,20 @@ struct RevealView: View {
             .shadow(color: .black.opacity(0.12), radius: 5, y: 2)
 
             Text(l10n.t(pageImage == nil ? "You didn't write it down." : "What you wrote down."))
-                .font(.system(size: 10))
+                .font(.system(size: 11))
                 .foregroundColor(AppTheme.inkSoft)
+                // The label used to sit bare on the desk at ten points, which
+                // read as a smudge rather than a caption. It gets its own strip
+                // of paper, the way a caption under a photograph would.
+                .padding(.horizontal, 7)
+                .padding(.vertical, 3)
+                .background(
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(AppTheme.paper.opacity(0.93))
+                )
         }
         .opacity(pageOpacity)
-        .padding(.leading, 16)
-        .padding(.bottom, 12)
+        .padding(.leading, 18)
+        .padding(.bottom, 20)
     }
 }

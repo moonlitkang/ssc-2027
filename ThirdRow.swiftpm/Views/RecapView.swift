@@ -93,7 +93,11 @@ struct RecapView: View {
                     .multilineTextAlignment(.center)
                     .padding(.top, 4)
             }
-            .padding(.bottom, 34)
+
+            // Both ends need a flexible spacer. With only the one at the top,
+            // the whole ending slid to the bottom of an iPad and left a third of
+            // the screen empty above it.
+            Spacer(minLength: 12)
         }
         .padding(.horizontal, 34)
         .onAppear {
