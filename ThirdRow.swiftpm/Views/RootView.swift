@@ -80,10 +80,7 @@ struct RootView: View {
                     }
                 }
                 .onAppear {
-                    eye.reset(
-                        baseClarity: Act.all[index].baseClarity,
-                        squintGain: Act.all[index].squintGain
-                    )
+                    eye.reset(sphericalError: Act.all[index].sphericalError)
                 }
 
             case .ask:

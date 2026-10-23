@@ -34,7 +34,7 @@ struct StageView: View {
                 .padding(.top, 24)
                 .padding(.bottom, 18)
 
-            ClassroomScene(act: act, blurRadius: eye.blurRadius)
+            ClassroomScene(act: act, defocus: eye.defocus)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .contentShape(Rectangle())

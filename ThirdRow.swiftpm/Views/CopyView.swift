@@ -27,6 +27,14 @@ struct CopyView: View {
 
     private var act: Act { Act.last }
 
+    private var boardBlur: CGFloat {
+        Defocus(
+            sphericalError: act.sphericalError,
+            pupilMM: Optics.dilatedPupilMM
+        )
+        .radius(at: Defocus.Distance.board, width: Optics.referenceWidth)
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             VStack(spacing: 5) {
@@ -83,7 +91,9 @@ struct CopyView: View {
     }
 
     /// The board as it looks from the last row: legible as a shape, useless as
-    /// information. Deliberately not tied to the squint state.
+    /// information. Same prescription as the act before it, and the same six
+    /// metres — so it is the same amount of blur, not a number chosen to look
+    /// right.
     private var board: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 4)
@@ -93,7 +103,7 @@ struct CopyView: View {
                 ChalkText(text: act.heading, size: 16, seed: 3)
                 ChalkText(text: act.problem, size: 30, seed: 11, weight: .medium)
             }
-            .blur(radius: 5.5)
+            .blur(radius: boardBlur)
         }
         .padding(4)
         .background(AppTheme.wood)

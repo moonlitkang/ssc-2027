@@ -76,7 +76,11 @@ struct StudentSilhouette: View {
 ///    desk legs all agree on where the ground is.
 struct ClassroomScene: View {
     let act: Act
-    let blurRadius: CGFloat
+
+    /// A single number used to be handed in here — a blur radius — and every
+    /// far surface got the same one. Now the eye is handed in, and each surface
+    /// is blurred by how far away it actually is. See `Optics`.
+    let defocus: Defocus
 
     /// 0 = far, 1 = middle, 2 = near.
     private var slots: [Int] {
@@ -98,12 +102,15 @@ struct ClassroomScene: View {
                 eyeChart(w: w, h: h)
                 timetable(w: w, h: h)
                 teacherDesk(w: w, h: h)
+                    .blur(radius: defocus.radius(at: Defocus.Distance.teacherDesk, width: w))
 
                 ForEach(slots, id: \.self) { slot in
                     deskRow(slot: slot, w: w, h: h)
+                        .blur(radius: defocus.radius(at: Defocus.Distance.headsAhead, width: w))
                 }
 
                 yourDesk(w: w, h: h)
+                    .blur(radius: defocus.radius(at: Defocus.Distance.yourDesk, width: w))
             }
             .clipped()
         }
@@ -187,7 +194,7 @@ struct ClassroomScene: View {
 
                 boardText
                     .padding(.horizontal, boardW * 0.07)
-                    .blur(radius: blurRadius)
+                    .blur(radius: defocus.radius(at: Defocus.Distance.board, width: w))
             }
             .frame(width: boardW, height: boardH)
             .padding(4)
@@ -264,7 +271,7 @@ struct ClassroomScene: View {
             RoundedRectangle(cornerRadius: 2)
                 .strokeBorder(AppTheme.ink.opacity(0.12), lineWidth: 0.6)
         )
-        .blur(radius: blurRadius * 0.8)
+        .blur(radius: defocus.radius(at: Defocus.Distance.wallChart, width: w))
         .position(x: w * 0.805, y: h * 0.215)
     }
 
@@ -293,7 +300,7 @@ struct ClassroomScene: View {
             Rectangle()
                 .strokeBorder(AppTheme.ink.opacity(0.10), lineWidth: 0.6)
         )
-        .blur(radius: blurRadius * 0.85)
+        .blur(radius: defocus.radius(at: Defocus.Distance.wallChart, width: w))
         // Right-aligned with the eye chart above it, and low enough that the two
         // cards no longer touch. They used to overlap by a few points, which at
         // row 7's blur turned into one white smear with two centres.

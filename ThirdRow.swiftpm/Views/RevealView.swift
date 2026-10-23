@@ -26,7 +26,10 @@ struct RevealView: View {
 
     @ObservedObject private var l10n = L10n.shared
 
-    @State private var blur: CGFloat = 11
+    /// 0 = the eye as it was in row seven, 1 = corrected. The blur is no longer
+    /// an arbitrary radius that slides to zero; it is the prescription sliding
+    /// to zero, and every distance in the room refocuses at its own rate.
+    @State private var correction: Double = 0
     @State private var captionOpacity: Double = 0
     @State private var sceneOpacity: Double = 0
     @State private var noteOpacity: Double = 0
@@ -53,7 +56,13 @@ struct RevealView: View {
                 .padding(.top, 24)
                 .padding(.bottom, 18)
 
-            ClassroomScene(act: lastAct, blurRadius: blur)
+            ClassroomScene(
+                act: lastAct,
+                defocus: Defocus(
+                    sphericalError: lastAct.sphericalError * (1 - correction),
+                    pupilMM: Optics.dilatedPupilMM
+                )
+            )
                 .clipShape(RoundedRectangle(cornerRadius: 10))
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .opacity(sceneOpacity)
@@ -80,7 +89,7 @@ struct RevealView: View {
         .padding(.horizontal, 34)
         .onAppear {
             withAnimation(.easeOut(duration: 0.35)) { sceneOpacity = 1 }
-            withAnimation(.easeOut(duration: 0.8).delay(0.6)) { blur = 0 }
+            withAnimation(.easeOut(duration: 0.8).delay(0.6)) { correction = 1 }
             withAnimation(.easeIn(duration: 0.5).delay(0.4)) { captionOpacity = 1 }
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.55) {

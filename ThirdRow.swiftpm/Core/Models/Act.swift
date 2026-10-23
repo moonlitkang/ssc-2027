@@ -20,11 +20,11 @@ struct Act: Identifiable {
 
     let fontSize: CGFloat
 
-    let baseClarity: Double
-
-    /// How much relief squinting still gives. It shrinks with every row,
-    /// because squinting is a workaround, not a fix.
-    let squintGain: Double
+    /// The prescription this act is seen through, in dioptres. Positive means
+    /// myopic. It is the only thing that decides how much the room blurs — see
+    /// `Optics`. September is mild enough to read a board from the middle of the
+    /// room; December is not, from anywhere.
+    let sphericalError: Double
 
     let hint: String
 
@@ -61,8 +61,7 @@ extension Act {
             problem: "3x + 7 = 22",
             note: "Ex. 1-8, odd only",
             fontSize: 40,
-            baseClarity: 0.90,
-            squintGain: 1.00,
+            sphericalError: 0.50,
             hint: "Hold the board to squint.",
             lateLines: ["You don't have to. Not yet."],
             requiredSquint: 1.5,
@@ -77,8 +76,7 @@ extension Act {
             problem: "3x + 7 = 22",
             note: "Ex. 1-8, odd only",
             fontSize: 31,
-            baseClarity: 0.62,
-            squintGain: 0.72,
+            sphericalError: 1.50,
             hint: "Hold the board to squint.",
             lateLines: [
                 "The problem comes back. The line under it doesn't.",
@@ -96,8 +94,7 @@ extension Act {
             problem: "3x + 7 = 22",
             note: "Ex. 1-8, odd only",
             fontSize: 22,
-            baseClarity: 0.28,
-            squintGain: 0.38,
+            sphericalError: 2.75,
             hint: "Hold the board to squint.",
             lateLines: [
                 "The shapes get bigger. They don't get sharper.",
