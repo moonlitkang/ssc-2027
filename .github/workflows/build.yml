@@ -15,6 +15,14 @@ name: build
 # available without a paid developer account.
 on:
   workflow_dispatch:
+    inputs:
+      phases:
+        description: "Space-separated beats to photograph (intro stage1 stage2 stage3 ask copy interlude reveal recap)"
+        required: false
+        # Asking for everything took longer than the step's timeout and the run
+        # only came back with the first three. The default is the set that has
+        # never been seen rendered; pass the full list when you want all of it.
+        default: "ask copy interlude reveal recap"
 
 jobs:
   build:
@@ -83,10 +91,14 @@ jobs:
           if-no-files-found: error
 
       # The ipa is already stored above, so this step may time out freely.
+      # A cold Intel simulator spends a couple of minutes on each relaunch, so
+      # the beat list is an input: you ask for the beats you still need to see.
       - name: Screenshot every beat
         continue-on-error: true
-        timeout-minutes: 10
+        timeout-minutes: 25
         working-directory: ThirdRow.swiftpm
+        env:
+          PHASES: ${{ inputs.phases }}
         run: |
           APP=$(find build/Build/Products -name "*.app" -maxdepth 4 | head -1)
           echo "app: $APP"
@@ -100,14 +112,14 @@ jobs:
             sleep 2
           done
           xcrun simctl install booted "$APP"
-          for PHASE in intro stage1 stage3 ask copy reveal recap; do
+          for PHASE in ${PHASES:-ask copy interlude reveal recap}; do
             xcrun simctl terminate booted "$BID" || true
             sleep 1
             xcrun simctl launch booted "$BID" -startAt "$PHASE" || true
             # Four seconds was not enough on a cold simulator: intro, stage3 and
             # ask all came back as a blank launch screen. Wait for the first
             # paint, then shoot twice so a late frame overwrites an early one.
-            sleep 6
+            sleep 7
             xcrun simctl io booted screenshot "../shot-$PHASE.png" || true
             sleep 2
             xcrun simctl io booted screenshot "../shot-$PHASE.png" || true

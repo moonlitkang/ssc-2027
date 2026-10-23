@@ -3,6 +3,10 @@ import CoreGraphics
 struct Act: Identifiable {
     let id: Int
     let row: Int
+
+    /// The month, not the row. The row number already sits in the corner, and
+    /// printing it twice made the top of every act read like a bug. This line
+    /// carries the only thing the corner does not: how much of the term is gone.
     let caption: String
 
     /// The heading is chalked smaller, the way it would be written on a board.
@@ -52,7 +56,7 @@ extension Act {
         Act(
             id: 0,
             row: 3,
-            caption: "Row 3.",
+            caption: "September.",
             heading: "Solve for x:",
             problem: "3x + 7 = 22",
             note: "Ex. 1-8, odd only",
@@ -68,7 +72,7 @@ extension Act {
         Act(
             id: 1,
             row: 5,
-            caption: "Row 5.",
+            caption: "October.",
             heading: "Solve for x:",
             problem: "3x + 7 = 22",
             note: "Ex. 1-8, odd only",
@@ -82,12 +86,12 @@ extension Act {
             ],
             requiredSquint: 7.0,
             distance: 0.42,
-            advance: "Two weeks later"
+            advance: "Two months later"
         ),
         Act(
             id: 2,
             row: 7,
-            caption: "Row 7.",
+            caption: "December.",
             heading: "Solve for x:",
             problem: "3x + 7 = 22",
             note: "Ex. 1-8, odd only",

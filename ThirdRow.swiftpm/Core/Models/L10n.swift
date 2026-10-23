@@ -72,10 +72,11 @@ final class L10n: ObservableObject {
         "Ex. 1-8, odd only": "练习 1-8，只做单数",
         "Hold the board to squint.": "按住黑板，眯着眼看。",
         "Eye strain": "眼睛的疲劳",
-        "Row 3.": "第三排。",
-        "Row 5.": "第五排。",
-        "Row 7.": "第七排。",
+        "September.": "九月。",
+        "October.": "十月。",
+        "December.": "十二月。",
         "Two weeks later": "两周后",
+        "Two months later": "两个月后",
         "Ask someone": "问问别人",
 
         // The three failures

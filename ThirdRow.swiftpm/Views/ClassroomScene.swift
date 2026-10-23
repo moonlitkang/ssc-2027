@@ -294,7 +294,10 @@ struct ClassroomScene: View {
                 .strokeBorder(AppTheme.ink.opacity(0.10), lineWidth: 0.6)
         )
         .blur(radius: blurRadius * 0.85)
-        .position(x: w * 0.845, y: h * 0.375)
+        // Right-aligned with the eye chart above it, and low enough that the two
+        // cards no longer touch. They used to overlap by a few points, which at
+        // row 7's blur turned into one white smear with two centres.
+        .position(x: w * 0.862, y: h * 0.405)
     }
 
     // MARK: - Front of the room
