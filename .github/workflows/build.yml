@@ -118,13 +118,19 @@ jobs:
           done
           xcrun simctl install booted "$APP"
           for PHASE in ${PHASES:-stage3squint stage3fog copy}; do
+            # The ending's measured lines come from a drawing, which this run
+            # cannot make. -ink stands in a plausible drawing so the layout can
+            # be photographed; without it the last screen is only ever verified
+            # by hand.
+            EXTRA=""
+            [ "$PHASE" = "recap" ] && EXTRA="-ink"
             # --terminate-running-process kills whatever is on screen and starts
             # a fresh one in a single atomic step. A separate `simctl terminate`
             # races with the previous launch: when that launch is slow, terminate
             # finds nothing to kill, the old instance survives, and `launch` only
             # brings it to the front — so the file named "interlude" ends up
             # holding a picture of "ask".
-            xcrun simctl launch --terminate-running-process booted "$BID" -startAt "$PHASE" -hold || true
+            xcrun simctl launch --terminate-running-process booted "$BID" -startAt "$PHASE" -hold $EXTRA || true
             # -hold keeps the two self-advancing beats (interlude at 6.2s,
             # reveal at 9.6s) from moving on while this runner takes its time
             # painting. Without it a slow launch photographs the next screen.

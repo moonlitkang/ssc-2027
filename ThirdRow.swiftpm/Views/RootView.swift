@@ -68,6 +68,15 @@ struct RootView: View {
            let seconds = Double(args[j + 1]) {
             squintFromStart = seconds
         }
+        // Capture only. The ending has three measured lines and two of them
+        // come from a drawing, which a screenshot run cannot make — so without
+        // this the only way to see them is to play the piece by hand and
+        // screenshot the last screen yourself. The numbers are deliberately
+        // plausible rather than round, so a layout that only fits a two-digit
+        // count does not pass.
+        captureInk = args.contains("-ink")
+            ? InkMetrics(strokes: 7, lengthCM: 24, pauses: 5, pauseSeconds: 9.4)
+            : nil
         startsSquinting = squintFromStart
         _phase = State(initialValue: initial)
     }
@@ -77,6 +86,9 @@ struct RootView: View {
 
     /// Set by the `stage3squint` / `stage3fog` beats, or by `-squintFor`.
     private var startsSquinting: Double?
+
+    /// Set by `-ink`. Stands in for a drawing the screenshot run cannot make.
+    private var captureInk: InkMetrics?
 
     var body: some View {
         ZStack {
@@ -146,7 +158,7 @@ struct RootView: View {
                 }
 
             case .recap:
-                RecapView(eye: eye, ink: ink)
+                RecapView(eye: eye, ink: captureInk ?? ink)
                     .pageWidth()
             }
         }

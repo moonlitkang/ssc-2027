@@ -41,6 +41,7 @@ An AI assistant (a large language model used through a coding tool) helped with:
 | 2026-10-23 | Mechanic | The seat became a real variable: `Act.boardDistance` at 3.5 / 5.0 / 6.5 m, replacing the single constant that made all three acts the same distance | Chose to make the model honest rather than make the title true. The measurement says moving from the last row to the third is worth 5.1% of blur, so the piece now says that instead of implying the seat is the cause — and December's line about the front row going to someone else is the author's, from what actually happens to seats in a class of fifty |
 | 2026-10-23 | Copy scene | The first page is kept rather than the last | Found that overwriting it meant the ending handed back the copy of a second opinion, when the whole reason for asking twice is that the first answer was already second-hand |
 | 2026-10-23 | Measurement | `InkMetrics` converts points to centimetres at 132 per inch instead of 72 | Corrected a unit error of 83% in the one number the piece claims to have measured rather than written |
+| 2026-10-23 | Measurement | Pause detection: the gaps between stroke timestamps longer than 0.8 s, reported on the ending card as "your pencil stopped N times" | Asked for the piece to take a real signal in rather than only render one out. Chose the pause over any other derived quantity because it is the only one the player cannot fake: a length can be scribbled, a stop cannot |
 
 ## Note for reviewers
 
