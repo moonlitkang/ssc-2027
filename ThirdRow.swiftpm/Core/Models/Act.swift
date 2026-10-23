@@ -20,6 +20,13 @@ struct Act: Identifiable {
 
     let fontSize: CGFloat
 
+    /// The seat this act's `boardDistance` is measured against, in metres.
+    /// Everything on the far wall is a fixed physical size, so how much of the
+    /// view it fills is proportional to the reciprocal of the distance — and
+    /// `fontSize` is defined at *this* distance. The scene multiplies both by
+    /// `referenceBoardDistance / boardDistance`.
+    static let referenceBoardDistance: Double = 3.5
+
     /// The prescription this act is seen through, in dioptres. Positive means
     /// myopic. It is the only thing that decides how much the room blurs — see
     /// `Optics`. September is mild enough to read a board from the middle of the
@@ -96,6 +103,10 @@ extension Act {
             heading: "Solve for x:",
             problem: "3x + 7 = 22",
             note: "Ex. 1-8, odd only",
+            // Forty at the reference distance, three and a half metres. The
+            // scene scales this down as the seat moves back, so the number here
+            // is the same for all three acts: the chalk does not get smaller,
+            // you do.
             fontSize: 40,
             sphericalError: 0.50,
             boardDistance: 3.5,
@@ -119,7 +130,7 @@ extension Act {
             heading: "Solve for x:",
             problem: "3x + 7 = 22",
             note: "Ex. 1-8, odd only",
-            fontSize: 31,
+            fontSize: 40,
             sphericalError: 1.50,
             boardDistance: 5.0,
             hint: "Hold the board to squint.",
@@ -148,13 +159,12 @@ extension Act {
             // is also just what a term of maths looks like.
             problem: "5x - 3 = 27",
             note: "Ex. 1-8, odd only",
-            // Twenty rather than twenty-two: at twenty-two, squinting in the
-            // last row landed on the same blur-per-glyph as the fifth row at
-            // rest, which is legible in the screenshots — i.e. the mechanic
-            // quietly contradicted the act. Smaller at the back is also just
-            // perspective.
-            fontSize: 20,
-            sphericalError: 2.75,
+            fontSize: 40,
+            // Three rather than two and three quarters. At 2.75 D the board was
+            // still reading as "a board with writing on it" at the back of the
+            // room, which is not the failure the act is about; at three it is
+            // only light and shape.
+            sphericalError: 3.0,
             boardDistance: 6.5,
             hint: "Hold the board to squint.",
             lateLines: [

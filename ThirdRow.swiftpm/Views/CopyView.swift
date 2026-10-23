@@ -110,9 +110,10 @@ struct CopyView: View {
             // rather than shared because that view takes a size, not a ratio —
             // and a board whose proportions are off is not the same board.
             let canvas = geo.size.width
-            let boardW = canvas * Self.boardWidthFraction
+            let perspective = CGFloat(Act.referenceBoardDistance / act.boardDistance)
+            let boardW = canvas * Self.boardWidthFraction * perspective
             let boardH = boardW * Self.boardAspect
-            let scale = canvas / Optics.referenceWidth
+            let scale = canvas / Optics.referenceWidth * perspective
             let blur = Defocus(
                 sphericalError: act.sphericalError,
                 pupilMM: Optics.dilatedPupilMM

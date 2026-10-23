@@ -94,6 +94,21 @@ struct ClassroomScene: View {
         }
     }
 
+    /// How much of the view the far wall fills, relative to the act the board is
+    /// sized for.
+    ///
+    /// Everything on that wall is a fixed object at a fixed place, so as the
+    /// seat moves back it takes up a share of the view that falls as the
+    /// reciprocal of the distance. Without this the board, the eye chart, the
+    /// timetable and the teacher's desk were all the same size in September and
+    /// in December, and the only thing on screen that said "further back" was
+    /// the number of heads — the room never actually receded.
+    ///
+    /// By December the board is 54% of the size it was in September.
+    private var perspective: CGFloat {
+        CGFloat(Act.referenceBoardDistance / act.boardDistance)
+    }
+
     var body: some View {
         GeometryReader { geo in
             let w = geo.size.width
@@ -178,8 +193,8 @@ struct ClassroomScene: View {
     // MARK: - The wall
 
     private func board(w: CGFloat, h: CGFloat) -> some View {
-        let boardW = w * 0.56
-        let boardH = h * 0.32
+        let boardW = w * 0.56 * perspective
+        let boardH = h * 0.32 * perspective
         let totalH = boardH + 18
 
         return VStack(spacing: 0) {
@@ -219,10 +234,16 @@ struct ClassroomScene: View {
         // the same factor pins that ratio, and makes `referenceWidth` mean what
         // its name says.
         //
+        // The perspective factor is the same idea one level down: chalk written
+        // at a fixed size on a fixed board occupies a share of the view that
+        // falls as you move away from it. Without it the letters stayed the same
+        // size while the board shrank, which is not how either of those things
+        // works.
+        //
         // The note is chalked at roughly a third of the problem's size, so the
         // same blur radius swallows it a full row before it swallows the
         // problem. That difference is the argument of the second act.
-        let scale = w / Optics.referenceWidth
+        let scale = w / Optics.referenceWidth * perspective
         return VStack(alignment: .leading, spacing: act.fontSize * 0.26 * scale) {
             ChalkText(text: act.heading, size: act.fontSize * 0.44 * scale, seed: 3)
             ChalkText(text: act.problem, size: act.fontSize * scale, seed: 11, weight: .medium)
@@ -259,7 +280,7 @@ struct ClassroomScene: View {
 
     /// The eye chart on the side wall. It belongs to the subject, and it goes soft too.
     private func eyeChart(w: CGFloat, h: CGFloat) -> some View {
-        let cw = w * 0.23
+        let cw = w * 0.23 * perspective
         let rows: [(String, CGFloat)] = [
             ("E", 0.30),
             ("E E", 0.185),
@@ -289,8 +310,8 @@ struct ClassroomScene: View {
 
     /// The wall timetable. It gives the empty wall a second thing to be.
     private func timetable(w: CGFloat, h: CGFloat) -> some View {
-        let tw = w * 0.112
-        let th = h * 0.088
+        let tw = w * 0.112 * perspective
+        let th = h * 0.088 * perspective
 
         return VStack(alignment: .leading, spacing: th * 0.13) {
             ForEach(0..<5, id: \.self) { index in
@@ -322,7 +343,7 @@ struct ClassroomScene: View {
     // MARK: - Front of the room
 
     private func teacherDesk(w: CGFloat, h: CGFloat) -> some View {
-        let deskW = w * 0.24
+        let deskW = w * 0.24 * perspective
         let topH = h * 0.020
         let bodyH = h * 0.052
         let legH = h * 0.030
