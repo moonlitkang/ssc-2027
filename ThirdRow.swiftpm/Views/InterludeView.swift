@@ -20,7 +20,15 @@ struct InterludeView: View {
 
     @ObservedObject private var l10n = L10n.shared
 
+    @Environment(\.horizontalSizeClass) private var sizeClass
+
     @State private var visible = 0
+
+    /// Twenty points reads as a caption on an iPad. This is the one sentence the
+    /// whole piece exists to deliver, so on a regular-width screen it grows
+    /// rather than floating small in the middle of a lot of paper.
+    private var lineSize: CGFloat { sizeClass == .regular ? 27 : 20 }
+    private var lineGap: CGFloat { sizeClass == .regular ? 9 : 7 }
 
     /// Translate first, then split: the table keys are the whole two-line
     /// sentence, not its halves.
@@ -34,10 +42,10 @@ struct InterludeView: View {
 
             ForEach(lines.indices, id: \.self) { index in
                 Text(lines[index])
-                    .font(.system(size: 20, weight: .medium))
+                    .font(.system(size: lineSize, weight: .medium))
                     .foregroundColor(AppTheme.ink)
                     .multilineTextAlignment(.center)
-                    .lineSpacing(7)
+                    .lineSpacing(lineGap)
                     .opacity(index < visible ? 1 : 0)
             }
 
