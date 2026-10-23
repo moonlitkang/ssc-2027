@@ -28,8 +28,10 @@ About three minutes, in four movements:
 3. **Row 7, December** — squinting gives back about half of a blur that is now
    nearly three dioptres wide, and it gives it back for a second and a half
    before the muscle and the tear film give up. The question is a different one
-   this month, so the answer cannot be remembered off the board. The way out
-   appears only after thirteen seconds of actually looking.
+   this month, so the answer cannot be remembered off the board. Somewhere in the
+   middle of it the piece says the only thing it has to say about seating: you
+   moved up two rows in November, and in December the seat went to someone else.
+   The way out appears only after thirteen seconds of actually looking.
 4. **Ask** — you ask someone, twice, because the first answer turns out to be a
    copy of a copy.
 5. **Copy** — they read it out loud and you write it down with a pencil. The board
@@ -51,15 +53,23 @@ defocus = max(0, S − 1/distance)    (dioptres)
 ```
 
 `S` is the act's refractive error: +0.50 D in September, +1.50 D in October,
-+2.75 D in December. Those are ordinary childhood myopia values, and they are the
-only per-act numbers that were chosen. Everything else is derived.
++2.75 D in December, and `d` is how far the board is from that act's seat —
+3.5 m, 5.0 m, 6.5 m. Those are ordinary childhood myopia values and ordinary
+classroom distances. They are *not* the only numbers that were chosen: the type
+size on the board, the seconds each act asks for, and the stamina figures below
+are all picked by hand. What is derived is the blur, and the blur is what the
+piece is arguing about.
 
 Two consequences the old hand-tuned version could not produce:
 
-- **Distance matters.** The board is six metres away, the teacher's desk three,
-  the heads in front of you one and eight, your own desk forty-five centimetres.
-  Every one gets its own blur radius in the same frame. At row 7 the whole front
-  of the room goes soft while the page under your hand stays readable.
+- **Distance matters, but less than the story assumed.** Every surface gets its
+  own radius in the same frame: the board at three to six and a half metres, the
+  teacher's desk at three, the heads in front at one-eight, your own desk at
+  forty-five centimetres. At row 7 the front of the room goes soft while the
+  page under your hand stays readable. What the model also says, once the seat
+  is a real variable, is that moving from the last row to the third at −2.75 D
+  changes the blur by **5.1%**. The front row is worth about a fortnight. It is
+  not the mechanism, and the last act now says so out loud.
 - **Only things past the far point blur.** A short-sighted eye can always add
   power to focus on something near; what it cannot do is relax. The `max(0, …)`
   is that fact, and without it the model would claim a −0.5 D eye cannot read the
