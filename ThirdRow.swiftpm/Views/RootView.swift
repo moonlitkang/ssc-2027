@@ -36,11 +36,14 @@ struct RootView: View {
     /// Lets CI jump straight to a beat so each screen can be captured without tapping.
     /// Usage: launch with `-startAt stage1|stage2|stage3|ask|ask2|copy|interlude|reveal|recap`.
     /// Add `-hold` alongside it to keep a self-advancing beat on screen.
+    /// Add `-squintFor <seconds>` to open the act already squinting for that
+    /// long, which is the only way to photograph the state the mechanic lives
+    /// in — and the only way to see what the relief looks like once it is gone.
     init() {
         var initial: Phase = .intro
         let args = ProcessInfo.processInfo.arguments
         freezeForCapture = args.contains("-hold")
-        var squintFromStart = false
+        var squintFromStart: Double?
         if let i = args.firstIndex(of: "-startAt"), i + 1 < args.count {
             switch args[i + 1] {
             case "stage1": initial = .stage(0)
@@ -48,7 +51,10 @@ struct RootView: View {
             case "stage3": initial = .stage(2)
             // The state the whole mechanic lives in, and the only one a finger
             // was ever needed for. Captured holding, so it can be looked at.
-            case "stage3squint": initial = .stage(2); squintFromStart = true
+            case "stage3squint": initial = .stage(2); squintFromStart = 0.3
+            // Thirteen seconds in: the relief has bottomed out. Without this
+            // beat the act was signed off on the strength of its clearest frame.
+            case "stage3fog": initial = .stage(2); squintFromStart = 13.0
             case "ask", "ask2": initial = .ask
             case "copy": initial = .copy(.classmate)
             case "interlude": initial = .interlude(.classmate)
@@ -57,6 +63,11 @@ struct RootView: View {
             default: break
             }
         }
+        if let j = args.firstIndex(of: "-squintFor"),
+           j + 1 < args.count,
+           let seconds = Double(args[j + 1]) {
+            squintFromStart = seconds
+        }
         startsSquinting = squintFromStart
         _phase = State(initialValue: initial)
     }
@@ -64,8 +75,8 @@ struct RootView: View {
     /// Set by `-hold`. Only the two beats that advance themselves look at it.
     private var freezeForCapture: Bool
 
-    /// Set by the `stage3squint` capture beat.
-    private var startsSquinting: Bool
+    /// Set by the `stage3squint` / `stage3fog` beats, or by `-squintFor`.
+    private var startsSquinting: Double?
 
     var body: some View {
         ZStack {
@@ -92,9 +103,8 @@ struct RootView: View {
                         phase = .ask
                     }
                 }
-                .onAppear {
-                    eye.reset(sphericalError: Act.all[index].sphericalError)
-                }
+                // The eye is reset by StageView itself, before it applies any
+                // capture beat — see the comment on its onAppear.
 
             case .ask:
                 AskView(excluding: asked, round: asked.isEmpty ? 1 : 2) { source in

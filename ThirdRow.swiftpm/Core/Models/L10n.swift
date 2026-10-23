@@ -81,6 +81,7 @@ final class L10n: ObservableObject {
         "Solve for x:": "求 x：",
         "Ex. 1-8, odd only": "练习 1-8，只做单数",
         "Hold the board to squint.": "按住黑板，眯着眼看。",
+        "Press and hold the board.": "按住黑板。",
         "Eye strain": "眼睛的疲劳",
         "September.": "九月。",
         "October.": "十月。",
@@ -91,7 +92,7 @@ final class L10n: ObservableObject {
 
         // The three failures
         "You don't have to. Not yet.": "现在还不必。",
-        "The problem comes back. The line under it doesn't.": "题目回来了。下面那行没有。",
+        "You can still make out the problem. The line under it is gone.": "题目还看得出轮廓。下面那行没了。",
         "You lean forward until your chair lifts off the floor. You sit back.": "你往前倾，椅子后腿翘了起来。你坐回去。",
         "The shapes get bigger. They don't get sharper.": "字形变大了。没有变清楚。",
         "You try again. Your eyes water.": "你又试了一次。眼睛发酸。",

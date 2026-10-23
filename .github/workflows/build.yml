@@ -17,12 +17,17 @@ on:
   workflow_dispatch:
     inputs:
       phases:
-        description: "Space-separated beats to photograph (intro stage1 stage2 stage3 ask copy interlude reveal recap)"
+        description: "Space-separated beats to photograph (intro stage1 stage2 stage3 stage3squint stage3fog ask copy interlude reveal recap)"
         required: false
         # Asking for everything took longer than the step's timeout and the run
         # only came back with the first three. The default is the set that has
         # never been seen rendered; pass the full list when you want all of it.
-        default: "ask copy interlude reveal recap"
+        #
+        # stage3squint and stage3fog are the two frames the whole mechanic lives
+        # between: 0.3 s of relief, and thirteen seconds of it, after which the
+        # board is supposed to be gone. Both are unreachable without a finger on
+        # the glass, which is why they went unverified for so long.
+        default: "stage3squint stage3fog copy"
 
 jobs:
   build:
@@ -112,7 +117,7 @@ jobs:
             sleep 2
           done
           xcrun simctl install booted "$APP"
-          for PHASE in ${PHASES:-ask copy interlude reveal recap}; do
+          for PHASE in ${PHASES:-stage3squint stage3fog copy}; do
             # --terminate-running-process kills whatever is on screen and starts
             # a fresh one in a single atomic step. A separate `simctl terminate`
             # races with the previous launch: when that launch is slow, terminate

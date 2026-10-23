@@ -27,14 +27,6 @@ struct CopyView: View {
 
     private var act: Act { Act.last }
 
-    private var boardBlur: CGFloat {
-        Defocus(
-            sphericalError: act.sphericalError,
-            pupilMM: Optics.dilatedPupilMM
-        )
-        .radius(at: Defocus.Distance.board, width: Optics.referenceWidth)
-    }
-
     var body: some View {
         VStack(spacing: 0) {
             VStack(spacing: 5) {
@@ -51,7 +43,10 @@ struct CopyView: View {
             .padding(.bottom, 16)
 
             board
-                .frame(height: 146)
+                // Shorter than it was, because the lettering on it is now the
+                // size the last act used. The same board, seen from the same
+                // seat, has the same amount of white space around the writing.
+                .frame(height: 112)
                 .padding(.bottom, 18)
 
             notebook
@@ -96,23 +91,42 @@ struct CopyView: View {
     }
 
     /// The board as it looks from the last row: legible as a shape, useless as
-    /// information. Same prescription as the act before it, and the same six
-    /// metres — so it is the same amount of blur, not a number chosen to look
-    /// right.
+    /// information.
+    ///
+    /// This used to draw the problem at thirty points while the act before it
+    /// drew the same problem at twenty, and the blur radius was identical in
+    /// both — so the ratio of blur to letter size was *lower* here than on the
+    /// screen where you had just given up. Past about eight seconds of squinting
+    /// the last act's board was the foggier of the two, and the caption saying
+    /// you cannot check your work against it was describing the opposite of
+    /// what was on screen.
+    ///
+    /// Now both boards scale their lettering by the same factor, so "same
+    /// prescription, same six metres" is finally true of the thing you can
+    /// actually see: the same fraction of a letter is missing in both.
     private var board: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 4)
-                .fill(AppTheme.board)
+        GeometryReader { geo in
+            let scale = geo.size.width / Optics.referenceWidth
+            let blur = Defocus(
+                sphericalError: act.sphericalError,
+                pupilMM: Optics.dilatedPupilMM
+            )
+            .radius(at: Defocus.Distance.board, width: geo.size.width)
 
-            VStack(alignment: .leading, spacing: 10) {
-                ChalkText(text: act.heading, size: 16, seed: 3)
-                ChalkText(text: act.problem, size: 30, seed: 11, weight: .medium)
+            ZStack {
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(AppTheme.board)
+
+                VStack(alignment: .leading, spacing: act.fontSize * 0.26 * scale) {
+                    ChalkText(text: act.heading, size: act.fontSize * 0.44 * scale, seed: 3)
+                    ChalkText(text: act.problem, size: act.fontSize * scale, seed: 11, weight: .medium)
+                }
+                .blur(radius: blur)
             }
-            .blur(radius: boardBlur)
+            .padding(4)
+            .background(AppTheme.wood)
+            .clipShape(RoundedRectangle(cornerRadius: 7))
         }
-        .padding(4)
-        .background(AppTheme.wood)
-        .clipShape(RoundedRectangle(cornerRadius: 7))
     }
 
     private var notebook: some View {

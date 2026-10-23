@@ -195,7 +195,7 @@ struct ClassroomScene: View {
                 }
                 .clipShape(RoundedRectangle(cornerRadius: 4))
 
-                boardText
+                boardText(w: w)
                     .padding(.horizontal, boardW * 0.07)
                     .blur(radius: defocus.radius(at: Defocus.Distance.board, width: w))
             }
@@ -210,14 +210,23 @@ struct ClassroomScene: View {
         .position(x: w * 0.05 + (boardW + 8) / 2, y: h * 0.115 + totalH / 2)
     }
 
-    private var boardText: some View {
+    private func boardText(w: CGFloat) -> some View {
+        // Everything chalked scales with the drawing. The blur radius already
+        // does — it is derived from the width — but the letter sizes used to be
+        // absolute points, so the same act was sharp on a phone and fog on an
+        // iPad, and the only number that decides whether a word can be read
+        // (radius over glyph size) changed with the device. Scaling the type by
+        // the same factor pins that ratio, and makes `referenceWidth` mean what
+        // its name says.
+        //
         // The note is chalked at roughly a third of the problem's size, so the
         // same blur radius swallows it a full row before it swallows the
         // problem. That difference is the argument of the second act.
-        VStack(alignment: .leading, spacing: act.fontSize * 0.26) {
-            ChalkText(text: act.heading, size: act.fontSize * 0.44, seed: 3)
-            ChalkText(text: act.problem, size: act.fontSize, seed: 11, weight: .medium)
-            ChalkText(text: act.note, size: act.fontSize * 0.32, seed: 23)
+        let scale = w / Optics.referenceWidth
+        return VStack(alignment: .leading, spacing: act.fontSize * 0.26 * scale) {
+            ChalkText(text: act.heading, size: act.fontSize * 0.44 * scale, seed: 3)
+            ChalkText(text: act.problem, size: act.fontSize * scale, seed: 11, weight: .medium)
+            ChalkText(text: act.note, size: act.fontSize * 0.32 * scale, seed: 23)
                 .opacity(0.78)
         }
         .rotationEffect(.degrees(-0.5))

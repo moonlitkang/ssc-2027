@@ -11,8 +11,9 @@ struct StageView: View {
     @ObservedObject var eye: EyeState
     let act: Act
 
-    /// Capture only: open the act already holding, so the squinted frame exists.
-    var startsSquinting: Bool = false
+    /// Capture only: open the act already squinting for this many seconds, so
+    /// the squinted frame exists without a finger on the glass.
+    var startsSquinting: Double?
 
     let onNext: () -> Void
 
@@ -119,6 +120,10 @@ struct StageView: View {
         }
         .padding(.horizontal, 34)
         .onAppear {
+            // Reset here rather than in the parent: this runs before the capture
+            // beat below, whereas a parent's onAppear runs after the child's and
+            // would undo the frozen frame the capture just set up.
+            eye.reset(act: act)
             captionVisible = false
             lateLine = nil
             revealed = 0
@@ -126,9 +131,12 @@ struct StageView: View {
             baseline = eye.squintedSeconds
             withAnimation(.easeIn(duration: 0.45)) { captionVisible = true }
 
-            if startsSquinting {
-                eye.beginSquintForCapture()
-                SoundPlayer.shared.setStrain(0.4)
+            if let startsSquinting {
+                eye.beginSquintForCapture(after: startsSquinting)
+                SoundPlayer.shared.setStrain(eye.strain)
+                // The capture beat has already spent its seconds, so the lines
+                // that would have arrived during them have to arrive now.
+                updateProgress()
             }
 
             // strain changes five times a second while holding, which is a

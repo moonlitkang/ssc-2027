@@ -37,15 +37,37 @@ struct Act: Identifiable {
     /// length in the only currency that matters here: how long you try.
     let requiredSquint: Double
 
+    /// How long the squint actually relieves anything, and how much of it is
+    /// left once the face gives out.
+    ///
+    /// Both come from the same fact: the more defocus there is to press away,
+    /// the shorter the press lasts. Half a dioptre needs no press at all, so
+    /// September's is `.infinity` — nothing about that act depends on stamina,
+    /// and pretending otherwise would be a difficulty knob rather than a
+    /// consequence. December's is over almost as soon as it starts, because a
+    /// slit that has to cancel nearly three dioptres has to be held by a
+    /// muscle that is already complaining.
+    let reliefSeconds: Double
+    let reliefFloor: Double
+
+    /// Where the late lines land, in seconds of squinting. Empty means "spread
+    /// them evenly", which is what the first two acts want. The last act sets
+    /// them by hand: its lines are timed to what the board is doing, and even
+    /// spacing would put the first one at 3.25 s — before the blur has begun to
+    /// come back, i.e. while the line "they don't get sharper" is still a lie.
+    var lineTimes: [Double] = []
+
     /// 0 = standing at the board, 1 = the last row. Drives how dull and quiet
     /// the board sounds, so hearing degrades with sight.
     let distance: Double
 
     let advance: String
 
-    /// Late lines land at evenly spaced points across the required squint.
+    /// Late lines land at evenly spaced points across the required squint,
+    /// unless the act names its own times.
     var lineThresholds: [Double] {
         guard !lateLines.isEmpty else { return [] }
+        if lineTimes.count == lateLines.count { return lineTimes }
         let step = requiredSquint / Double(lateLines.count + 1)
         return (1...lateLines.count).map { step * Double($0) }
     }
@@ -62,9 +84,16 @@ extension Act {
             note: "Ex. 1-8, odd only",
             fontSize: 40,
             sphericalError: 0.50,
-            hint: "Hold the board to squint.",
+            // Not "to squint". At half a dioptre, squinting moves the blur on
+            // a forty-point line by one point and a bit — there is nothing to
+            // see, and there is not meant to be. This act teaches the gesture;
+            // the line above the button is the only thing that has to change,
+            // and it says so.
+            hint: "Press and hold the board.",
             lateLines: ["You don't have to. Not yet."],
             requiredSquint: 1.5,
+            reliefSeconds: .infinity,
+            reliefFloor: 1.0,
             distance: 0.0,
             advance: "Two weeks later"
         ),
@@ -78,11 +107,16 @@ extension Act {
             fontSize: 31,
             sphericalError: 1.50,
             hint: "Hold the board to squint.",
+            // "The problem comes back" used to carry the whole act, and it
+            // stopped being true once the last act changed questions. What is
+            // left is the thing the player can actually check on screen.
             lateLines: [
-                "The problem comes back. The line under it doesn't.",
+                "You can still make out the problem. The line under it is gone.",
                 "You lean forward until your chair lifts off the floor. You sit back."
             ],
             requiredSquint: 7.0,
+            reliefSeconds: 6.0,
+            reliefFloor: 0.72,
             distance: 0.42,
             advance: "Two months later"
         ),
@@ -91,7 +125,12 @@ extension Act {
             row: 7,
             caption: "December.",
             heading: "Solve for x:",
-            problem: "3x + 7 = 22",
+            // A different question on purpose. Every earlier version reused
+            // `3x + 7 = 22`, and a string that has been read twice is read the
+            // third time from memory: at the blur this act settles on, the
+            // remembered answer made the board legible when it was not. This
+            // is also just what a term of maths looks like.
+            problem: "5x - 3 = 27",
             note: "Ex. 1-8, odd only",
             // Twenty rather than twenty-two: at twenty-two, squinting in the
             // last row landed on the same blur-per-glyph as the fifth row at
@@ -107,6 +146,14 @@ extension Act {
                 "You stop trying."
             ],
             requiredSquint: 13.0,
+            // Two seconds of relief, then it goes. The first line lands at 2.0
+            // s because that is when the blur starts coming back, not at 3.25
+            // s where even spacing would have put it — a line that says "they
+            // don't get sharper" has to arrive while they are visibly getting
+            // softer, or it is describing a screen nobody is looking at.
+            reliefSeconds: 1.5,
+            reliefFloor: 0.42,
+            lineTimes: [2.0, 5.0, 9.0],
             distance: 0.85,
             advance: "Ask someone"
         )
