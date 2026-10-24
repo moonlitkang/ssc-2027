@@ -187,7 +187,10 @@ struct RootView: View {
                     eye: eye,
                     ink: captureInk ?? ink,
                     captureSeconds: captureSeconds,
-                    onAskMissing: roomIsExhausted ? nil : { phase = .ask }
+                    onAskMissing: roomIsExhausted ? nil : { phase = .ask },
+                    // A capture run jumps straight here with nobody asked; the
+                    // stand-in drawing implies two doors were walked through.
+                    askedCount: captureInk != nil ? 2 : asked.count
                 )
                 .pageWidth()
             }

@@ -125,6 +125,8 @@ struct ClassroomScene: View {
 
             ZStack(alignment: .topLeading) {
                 room(w: w, h: h)
+                window(w: w, h: h)
+                clock(w: w, h: h)
                 board(w: w, h: h)
                 eyeChart(w: w, h: h)
                 timetable(w: w, h: h)
@@ -200,6 +202,79 @@ struct ClassroomScene: View {
     }
 
     // MARK: - The wall
+
+    /// A window, on the side wall.
+    ///
+    /// Added for the last act: once the board shrinks to 54% the wall around it
+    /// is a large area of nothing, and an empty area of nothing reads as a
+    /// drawing that was not finished rather than as a room you are sitting
+    /// further back in. Two objects near the edges are enough to make the space
+    /// read as wall.
+    ///
+    /// It does not recede the way the far wall does. It is beside the player, not
+    /// in front, so its bearing barely changes as the seat moves back — only its
+    /// apparent size does. Sliding it towards the centre along with the board
+    /// would have pushed it into the board.
+    private func window(w: CGFloat, h: CGFloat) -> some View {
+        let ww = w * 0.17 * (0.55 + 0.45 * perspective)
+        let wh = h * 0.33 * (0.55 + 0.45 * perspective)
+        let frame = max(1, ww * 0.035)
+
+        return ZStack {
+            Rectangle()
+                .fill(AppTheme.paper.opacity(0.92))
+
+            // Four panes.
+            Rectangle()
+                .fill(AppTheme.woodLight)
+                .frame(width: frame, height: wh)
+            Rectangle()
+                .fill(AppTheme.woodLight)
+                .frame(width: ww, height: frame)
+
+            Rectangle()
+                .strokeBorder(AppTheme.wood, lineWidth: frame)
+        }
+        .frame(width: ww, height: wh)
+        .position(x: w * 0.085, y: h * 0.30)
+    }
+
+    /// A clock, high on the wall behind the board.
+    ///
+    /// Its hands are fixed at twenty to four. That is the last lesson of the
+    /// day, which is when a board is hardest to read and when nobody is at their
+    /// best — and it is the same time in all three acts, because the point is
+    /// not that time passes but that the room does not change.
+    private func clock(w: CGFloat, h: CGFloat) -> some View {
+        let size = w * 0.072 * perspective
+        let rim = max(0.8, size * 0.028)
+        let hand = max(0.8, size * 0.022)
+
+        return ZStack {
+            Circle()
+                .fill(AppTheme.paper)
+            Circle()
+                .strokeBorder(AppTheme.ink.opacity(0.28), lineWidth: rim)
+
+            // Hour hand towards four, minute hand towards eight.
+            Rectangle()
+                .fill(AppTheme.ink.opacity(0.45))
+                .frame(width: hand, height: size * 0.22)
+                .offset(y: -size * 0.11)
+                .rotationEffect(.degrees(120))
+            Rectangle()
+                .fill(AppTheme.ink.opacity(0.45))
+                .frame(width: hand, height: size * 0.33)
+                .offset(y: -size * 0.165)
+                .rotationEffect(.degrees(240))
+
+            Circle()
+                .fill(AppTheme.ink.opacity(0.45))
+                .frame(width: hand * 1.6, height: hand * 1.6)
+        }
+        .frame(width: size, height: size)
+        .position(x: receded(w * 0.855, of: w), y: receded(h * 0.075, of: h))
+    }
 
     private func board(w: CGFloat, h: CGFloat) -> some View {
         let boardW = w * 0.56 * perspective

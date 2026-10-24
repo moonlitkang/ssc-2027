@@ -35,6 +35,15 @@ struct RecapView: View {
     /// convincing than any sentence claiming it leads nowhere.
     var onAskMissing: (() -> Void)?
 
+    /// How many people were asked, so the ending can state what came of it.
+    ///
+    /// The three answers never appear on screen together — they are separated by
+    /// a copying scene and a minute of play — so "all of them were the same
+    /// non-answer" used to be something the piece asserted rather than something
+    /// the player could see. Saying the count out loud is the cheapest way to put
+    /// them side by side: two doors, two failures.
+    var askedCount: Int = 0
+
     @ObservedObject private var l10n = L10n.shared
 
     @State private var numberVisible = false
@@ -126,6 +135,18 @@ struct RecapView: View {
             .padding(.top, 16)
             .padding(.horizontal, 6)
             .padding(.bottom, 40)
+
+            // The count, stated flatly. Two doors, two failures — which is the
+            // whole argument, and it is better made by arithmetic than by a
+            // sentence claiming all three answers were the same.
+            if askedCount >= 2 {
+                Text(l10n.askedSummary(askedCount))
+                    .font(.system(size: 14))
+                    .foregroundColor(AppTheme.inkSoft)
+                    .multilineTextAlignment(.center)
+                    .padding(.bottom, 26)
+                    .opacity(numberVisible ? 1 : 0)
+            }
 
             VStack(spacing: 7) {
                 Text(l10n.t("Nobody read it off the board."))

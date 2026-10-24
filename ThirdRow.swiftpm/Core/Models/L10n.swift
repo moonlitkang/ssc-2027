@@ -84,6 +84,21 @@ final class L10n: ObservableObject {
         return "Your pencil stopped \(pauses) \(unit).\nThe board did not change once."
     }
 
+    /// How many people were asked and what came of it. Stated as arithmetic
+    /// rather than as an opinion: the player did ask them, and none of them
+    /// could read the board.
+    func askedSummary(_ count: Int) -> String {
+        if language == .zh {
+            return count >= 3
+                ? "你问了三个。三个都看不清。"
+                : "你问了 \(count) 个。\(count) 个都看不清。"
+        }
+        if count >= 3 {
+            return "You asked all three.\nNone of them could read it."
+        }
+        return "You asked \(count) people.\nNeither of them could read it."
+    }
+
     func t(_ english: String) -> String {
         guard language == .zh else { return english }
         return L10n.table[english] ?? english
