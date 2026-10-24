@@ -134,7 +134,7 @@ struct RootView: View {
                 // capture beat — see the comment on its onAppear.
 
             case .ask:
-                AskView(excluding: asked, round: asked.isEmpty ? 1 : 2) { source in
+                AskView(excluding: asked, round: asked.count + 1) { source in
                     asked.insert(source)
                     phase = .copy(source)
                 }
@@ -173,8 +173,18 @@ struct RootView: View {
                 }
 
             case .recap:
-                RecapView(eye: eye, ink: captureInk ?? ink, captureSeconds: captureSeconds)
-                    .pageWidth()
+                // A door is left open when the player has asked fewer people
+                // than the room contains. Walking back through it costs thirty
+                // seconds and does not disturb the first page, the squint
+                // total, or anything else the ending just reported.
+                let roomIsExhausted = asked.count >= AnswerSource.allCases.count
+                RecapView(
+                    eye: eye,
+                    ink: captureInk ?? ink,
+                    captureSeconds: captureSeconds,
+                    onAskMissing: roomIsExhausted ? nil : { phase = .ask }
+                )
+                .pageWidth()
             }
         }
         // The language switch lives above every screen, in one place, so no

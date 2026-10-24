@@ -23,9 +23,17 @@ struct AskView: View {
     }
 
     private var title: String {
-        round == 1
-            ? l10n.t("You can't read it. So you ask.")
-            : l10n.t("That answer was second-hand too. So you ask someone else.")
+        switch round {
+        case 1:
+            return l10n.t("You can't read it. So you ask.")
+        case 2:
+            return l10n.t("That answer was second-hand too. So you ask someone else.")
+        default:
+            // The third door, offered from the ending rather than forced by the
+            // story. Different line, because "you ask someone else" would be a
+            // lie by then — you have already asked two.
+            return l10n.t("There was one more person in the room.")
+        }
     }
 
     var body: some View {

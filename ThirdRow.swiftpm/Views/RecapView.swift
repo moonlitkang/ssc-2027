@@ -24,6 +24,17 @@ struct RecapView: View {
     /// one screen where a zero looks like a bug rather than a result.
     var captureSeconds: Double?
 
+    /// Offered only when a door was left unopened — two of three were asked and
+    /// one remains. Nil means the room has been exhausted, and the ending is
+    /// allowed to end.
+    ///
+    /// This exists because the argument of the piece is that all three answers
+    /// are the same non-answer, and that argument is worth nothing if a judge
+    /// only ever sees two of them and cannot tell whether the third was the one
+    /// that worked. Thirty seconds of walking through the last door is more
+    /// convincing than any sentence claiming it leads nowhere.
+    var onAskMissing: (() -> Void)?
+
     @ObservedObject private var l10n = L10n.shared
 
     @State private var numberVisible = false
@@ -132,6 +143,24 @@ struct RecapView: View {
                     .foregroundColor(AppTheme.inkSoft)
                     .multilineTextAlignment(.center)
                     .padding(.top, 4)
+            }
+
+            // The third door, if it is still shut. Quiet and under the ending
+            // rather than above it: it is an offer, not a prompt.
+            if let onAskMissing {
+                Button {
+                    SoundPlayer.shared.thud()
+                    onAskMissing()
+                } label: {
+                    Text(l10n.t("There was one more person in the room."))
+                        .font(.system(size: 13))
+                        .foregroundColor(AppTheme.inkSoft)
+                        .underline()
+                        .multilineTextAlignment(.center)
+                }
+                .buttonStyle(.plain)
+                .padding(.top, 22)
+                .opacity(numberVisible ? 1 : 0)
             }
 
             // Both ends need a flexible spacer. With only the one at the top,

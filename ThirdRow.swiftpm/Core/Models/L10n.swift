@@ -132,9 +132,10 @@ final class L10n: ObservableObject {
         "The teacher says: page 42.": "老师说：第四十二页。",
 
         // What you find out afterwards
-        "Then he says: I can't see it either.\nHe copied it from her.": "然后他说：我也看不清。\n他是抄她的。",
-        "Her handwriting is smaller than the board.": "她的字比黑板还小。",
-        "You open the book.\nThe print is the same size as the board.": "你翻开书。\n上面的字和黑板一样大。",
+        "Then he says he can't see it either.\nHe has been copying from her since September.": "然后他说他也看不清。\n他从九月起就一直在抄她的。",
+        "Her handwriting is smaller than the board.\nShe fits two subjects into one notebook.": "她的字比黑板还小。\n她把两门课挤在一个本子里。",
+        "She reads the page out. Before she does, she squints at it.\nShe doesn't mention it.": "她把那一页念出来。念之前，她眯了一下眼。\n她没有提这件事。",
+        "There was one more person in the room.": "教室里还有一个人。",
 
         // Copying
         "You write it down.": "你抄下来。",
