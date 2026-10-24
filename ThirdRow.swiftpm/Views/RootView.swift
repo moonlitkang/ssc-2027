@@ -152,7 +152,12 @@ struct RootView: View {
                         written = page
                         ink = InkMetrics(drawing: page)
                     }
-                    phase = .interlude(source)
+                    // The third door is a re-visit, not a re-run. The glasses
+                    // were handed over the first time round; sending the player
+                    // through the interlude and the reveal again would play the
+                    // ending twice, including nine seconds of a room coming
+                    // back into focus. Straight back to the ending instead.
+                    phase = asked.count > askRounds ? .recap : .interlude(source)
                 }
 
             case .interlude(let source):

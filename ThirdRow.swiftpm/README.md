@@ -29,11 +29,14 @@ About three minutes, in four movements:
    nearly three dioptres wide, and it gives it back for a second and a half
    before the muscle and the tear film give up. The question is a different one
    this month, so the answer cannot be remembered off the board. Somewhere in the
-   middle of it the piece says the only thing it has to say about seating: you
-   moved up two rows in November, and in December the seat went to someone else.
+   middle of it the piece says the only thing it has to say about seating: the
+   school moves your seat again in November, and in December it is the last row.
    The way out appears only after thirteen seconds of actually looking.
 4. **Ask** — you ask someone, twice, because the first answer turns out to be a
-   copy of a copy.
+   copy of a copy. The ending then offers the third door once, in small type: the
+   one person you did not ask is a different kind of failure, not a better one.
+   Thirty seconds, and the claim that all three answers are the same non-answer
+   stops being something the piece asserts and becomes something you checked.
 5. **Copy** — they read it out loud and you write it down with a pencil. The board
    stays out of focus, so there is nothing to check your copying against.
 6. **Glasses** — the prescription is taken away in under a second, and the small

@@ -133,8 +133,8 @@ final class L10n: ObservableObject {
 
         // What you find out afterwards
         "Then he says he can't see it either.\nHe has been copying from her since September.": "然后他说他也看不清。\n他从九月起就一直在抄她的。",
-        "Her handwriting is smaller than the board.\nShe fits two subjects into one notebook.": "她的字比黑板还小。\n她把两门课挤在一个本子里。",
-        "She reads the page out. Before she does, she squints at it.\nShe doesn't mention it.": "她把那一页念出来。念之前，她眯了一下眼。\n她没有提这件事。",
+        "Her handwriting is smaller than the board.\nShe writes everything down. She is afraid of missing it.": "她的字比黑板还小。\n她什么都抄下来，她怕漏掉。",
+        "She reads the page out. Before she does, she turns and squints at the board.\nShe doesn't mention it.": "她把那一页念出来。念之前，她回头眯着眼看黑板。\n她没有提这件事。",
         "There was one more person in the room.": "教室里还有一个人。",
 
         // Copying

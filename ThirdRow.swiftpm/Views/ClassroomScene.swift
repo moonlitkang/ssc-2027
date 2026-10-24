@@ -109,6 +109,15 @@ struct ClassroomScene: View {
         CGFloat(Act.referenceBoardDistance / act.boardDistance)
     }
 
+    /// Where a fixed point on the far wall lands once the seat has moved back.
+    ///
+    /// A fixed object recedes towards the vanishing point, which is wherever the
+    /// eye is pointing — the middle of the frame. So a point keeps its bearing
+    /// but closes on the centre by the same factor its size shrinks by.
+    private func receded(_ value: CGFloat, of total: CGFloat) -> CGFloat {
+        total * 0.5 + (value - total * 0.5) * perspective
+    }
+
     var body: some View {
         GeometryReader { geo in
             let w = geo.size.width
@@ -197,6 +206,18 @@ struct ClassroomScene: View {
         let boardH = h * 0.32 * perspective
         let totalH = boardH + 18
 
+        // A fixed object recedes towards the vanishing point, which is where the
+        // eye is pointing — the middle of the frame. Pinning the board's top-left
+        // corner at a fixed fraction of the canvas and shrinking it instead made
+        // it slide into the corner as the seat moved back, which reads as "the
+        // board got smaller", not as "you got further away".
+        //
+        // So the corner is interpolated towards the centre of the frame by the
+        // same factor the size is scaled by. At perspective 1 it is exactly where
+        // it has always been; at 0.538 it has moved most of the way in.
+        let left = w * 0.5 + (w * 0.05 - w * 0.5) * perspective
+        let top = h * 0.5 + (h * 0.115 - h * 0.5) * perspective
+
         return VStack(spacing: 0) {
             ZStack {
                 RoundedRectangle(cornerRadius: 4)
@@ -222,7 +243,7 @@ struct ClassroomScene: View {
             chalkTray(width: boardW)
         }
         .frame(width: boardW + 8, height: totalH, alignment: .top)
-        .position(x: w * 0.05 + (boardW + 8) / 2, y: h * 0.115 + totalH / 2)
+        .position(x: left + (boardW + 8) / 2, y: top + totalH / 2)
     }
 
     private func boardText(w: CGFloat) -> some View {
@@ -305,7 +326,7 @@ struct ClassroomScene: View {
                 .strokeBorder(AppTheme.ink.opacity(0.12), lineWidth: 0.6)
         )
         .blur(radius: defocus.radius(at: Defocus.Distance.wallChart, width: w))
-        .position(x: w * 0.805, y: h * 0.215)
+        .position(x: receded(w * 0.805, of: w), y: receded(h * 0.215, of: h))
     }
 
     /// The wall timetable. It gives the empty wall a second thing to be.
@@ -337,7 +358,7 @@ struct ClassroomScene: View {
         // Right-aligned with the eye chart above it, and low enough that the two
         // cards no longer touch. They used to overlap by a few points, which at
         // row 7's blur turned into one white smear with two centres.
-        .position(x: w * 0.862, y: h * 0.405)
+        .position(x: receded(w * 0.862, of: w), y: receded(h * 0.405, of: h))
     }
 
     // MARK: - Front of the room
@@ -410,7 +431,7 @@ struct ClassroomScene: View {
             .offset(y: -4)
         }
         .frame(width: deskW, height: totalH)
-        .position(x: w * 0.34, y: floorY - totalH / 2)
+        .position(x: receded(w * 0.34, of: w), y: floorY - totalH / 2)
     }
 
     private func deskRow(slot: Int, w: CGFloat, h: CGFloat) -> some View {

@@ -160,11 +160,15 @@ extension Act {
             problem: "5x - 3 = 27",
             note: "Ex. 1-8, odd only",
             fontSize: 40,
-            // Three rather than two and three quarters. At 2.75 D the board was
-            // still reading as "a board with writing on it" at the back of the
-            // room, which is not the failure the act is about; at three it is
-            // only light and shape.
-            sphericalError: 3.0,
+            // Two and three quarters, not three. Three was tried and taken back
+            // out: at 3.0 D the far point is 33 cm, which is *nearer than the
+            // desk the player is writing on* — so the page under their hand
+            // goes out of focus too, and the one thing this act cannot afford to
+            // lose is the contrast between a board you cannot read and a page
+            // that stays sharp. The blur on the board is bought with perspective
+            // (the seat moves back, the board shrinks to 54%) rather than with
+            // the prescription.
+            sphericalError: 2.75,
             boardDistance: 6.5,
             hint: "Hold the board to squint.",
             lateLines: [
