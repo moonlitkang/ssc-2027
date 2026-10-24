@@ -239,16 +239,23 @@ struct ClassroomScene: View {
         .position(x: w * 0.085, y: h * 0.30)
     }
 
-    /// A clock, high on the wall behind the board.
+    /// A clock, high on the wall directly above the board.
     ///
     /// Its hands are fixed at twenty to four. That is the last lesson of the
     /// day, which is when a board is hardest to read and when nobody is at their
     /// best — and it is the same time in all three acts, because the point is
     /// not that time passes but that the room does not change.
+    ///
+    /// It hangs from the board rather than from a fraction of the wall. At a
+    /// fixed fraction it drifted into the eye chart as the seat moved back —
+    /// two pale circles side by side, one of them with hands on it.
     private func clock(w: CGFloat, h: CGFloat) -> some View {
-        let size = w * 0.072 * perspective
-        let rim = max(0.8, size * 0.028)
-        let hand = max(0.8, size * 0.022)
+        let size = w * 0.085 * perspective
+        let rim = max(0.8, size * 0.026)
+        let hand = max(0.8, size * 0.020)
+
+        // Same expression as the board's top edge, so the gap is constant.
+        let boardTop = h * 0.5 + (h * 0.115 - h * 0.5) * perspective
 
         return ZStack {
             Circle()
@@ -273,7 +280,7 @@ struct ClassroomScene: View {
                 .frame(width: hand * 1.6, height: hand * 1.6)
         }
         .frame(width: size, height: size)
-        .position(x: receded(w * 0.855, of: w), y: receded(h * 0.075, of: h))
+        .position(x: receded(w * 0.5, of: w), y: boardTop - size * 0.78)
     }
 
     private func board(w: CGFloat, h: CGFloat) -> some View {
